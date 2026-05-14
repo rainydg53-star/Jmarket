@@ -17,7 +17,7 @@ front/dist/
 front/dist-ssr/
 front/.env
 front/.env.*
-
+portfolio/
 # Backend / Gradle
 backend/.gradle/
 backend/build/
