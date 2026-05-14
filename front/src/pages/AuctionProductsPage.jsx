@@ -1,12 +1,11 @@
 ﻿import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../lib/api";
-import { getAuctionDisplayStatusInfo, getAuctionRemainingTimeInfo, isAuctionTimeExpired } from "../lib/auctionStatus";
+import { getAuctionDisplayStatusInfo, getAuctionRemainingTimeInfo, isAuctionTimeExpired, isAuctionWaitingToStart } from "../lib/auctionStatus";
 import { clearAccessToken } from "../lib/auth";
 import { loadCategoryOptions } from "../lib/categories";
+import { API_BASE_URL } from "../lib/config";
 import { canCreateAuction, isAdmin } from "../lib/permissions";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const CATEGORY_OPTIONS = [
   { value: "", label: "전체 카테고리" },
@@ -199,6 +198,7 @@ function AuctionProductsPage() {
               const remainingTime = getAuctionRemainingTimeInfo(auction, now);
               const displayStatus = getAuctionDisplayStatusInfo(auction, now);
               const visuallyClosed = auction.status === "CLOSED" || isAuctionTimeExpired(auction, now);
+              const waitingToStart = isAuctionWaitingToStart(auction, now);
               return (
               <li key={auction.id} className={`list-item${visuallyClosed ? " sold" : ""}`}>
                 {auction.thumbnailUrl ? (
@@ -221,7 +221,7 @@ function AuctionProductsPage() {
                 </span>
                 <span>현재 최고가: {auction.currentHighestBid.toLocaleString()}원</span>
                 <span className="meta">
-                  {auction.status === "CLOSED" ? "마감(KST)" : "종료(KST)"}: {formatKst(auction.status === "CLOSED" ? auction.closedAt : auction.endAt)}
+                  {waitingToStart ? "시작(KST)" : auction.status === "CLOSED" ? "마감(KST)" : "종료(KST)"}: {formatKst(waitingToStart ? auction.startAt : auction.status === "CLOSED" ? auction.closedAt : auction.endAt)}
                 </span>
                 {visuallyClosed ? <span className="sold-badge">{auction.status === "CLOSED" ? "경매마감" : "마감 확인중"}</span> : null}
               </li>

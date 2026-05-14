@@ -39,6 +39,8 @@ const LEDGER_TYPE_LABELS = {
   WITHDRAW_REQUEST: "출금 요청",
   WITHDRAW_COMPLETE: "출금 완료",
   WITHDRAW_REJECT: "출금 반려",
+  ADMIN_GRANT: "관리자 지급",
+  ADMIN_DEDUCT: "관리자 차감",
 };
 
 function MileagePage() {
@@ -312,6 +314,7 @@ function MileagePage() {
     COMPLETED: "완료",
     REJECTED: "반려",
   }[status] ?? status);
+  const shouldShowMessage = loading || message.includes("실패") || message.includes("오류") || message.includes("불러오는 중");
 
   return (
     <main className="container">
@@ -329,7 +332,7 @@ function MileagePage() {
         ) : (
           <p className="meta">잔액 정보 없음</p>
         )}
-        <p>{loading ? "요청 처리 중..." : message}</p>
+        {shouldShowMessage ? <p>{loading ? "요청 처리 중..." : message}</p> : null}
       </div>
 
       <div className="card">

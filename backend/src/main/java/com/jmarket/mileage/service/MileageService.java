@@ -10,6 +10,8 @@ import com.jmarket.mileage.domain.MileageLedgerType;
 import com.jmarket.mileage.domain.MileageWithdrawal;
 import com.jmarket.mileage.domain.MileageWithdrawalStatus;
 import com.jmarket.mileage.dto.MileageAccountResponse;
+import com.jmarket.mileage.dto.MileageAdminAdjustmentRequest;
+import com.jmarket.mileage.dto.MileageAdminAdjustmentType;
 import com.jmarket.mileage.dto.MileageLedgerResponse;
 import com.jmarket.mileage.dto.MileageWithdrawalCreateRequest;
 import com.jmarket.mileage.dto.MileageWithdrawalResponse;
@@ -27,6 +29,7 @@ public class MileageService {
     private static final String REF_TYPE_TRADE = "TRADE";
     private static final String REF_TYPE_AUCTION = "AUCTION";
     private static final String REF_TYPE_WITHDRAWAL = "WITHDRAWAL";
+    private static final String REF_TYPE_ADMIN_ADJUSTMENT = "ADMIN_ADJUSTMENT";
 
     private final MileageAccountRepository mileageAccountRepository;
     private final MileageLedgerRepository mileageLedgerRepository;
@@ -102,6 +105,24 @@ public class MileageService {
 
         safeAmountMutation(() -> account.debitBalance(amount));
         saveLedger(account, MileageLedgerType.USE, amount, "MANUAL_USE", 0L);
+        return MileageAccountResponse.from(account);
+    }
+
+    @Transactional
+    public MileageAccountResponse adjustMileageByAdmin(Long userId, MileageAdminAdjustmentRequest request) {
+        validatePositiveAmount(request.amount());
+        MileageAccount account = findOrCreateAccountForUpdate(userId);
+        if (request.type() == MileageAdminAdjustmentType.GRANT) {
+            safeAmountMutation(() -> account.addBalance(request.amount()));
+            saveLedger(account, MileageLedgerType.ADMIN_GRANT, request.amount(), REF_TYPE_ADMIN_ADJUSTMENT, userId);
+            return MileageAccountResponse.from(account);
+        }
+
+        if (account.getAvailableBalance() < request.amount()) {
+            throw new JmarketException(ErrorCode.MILEAGE_INSUFFICIENT_BALANCE);
+        }
+        safeAmountMutation(() -> account.debitBalance(request.amount()));
+        saveLedger(account, MileageLedgerType.ADMIN_DEDUCT, request.amount(), REF_TYPE_ADMIN_ADJUSTMENT, userId);
         return MileageAccountResponse.from(account);
     }
 

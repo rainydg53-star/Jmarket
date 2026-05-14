@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
-import { isAuthenticated, setAccessToken } from "../lib/auth";
+import { setAccessToken } from "../lib/auth";
 
 const formatKoreanDateTime = (value) => {
   if (!value) {
@@ -40,7 +40,7 @@ function LoginPage() {
   const [loginErrorModal, setLoginErrorModal] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const goProducts = () => navigate("/products", { replace: true });
+  const goHome = () => navigate("/", { replace: true });
 
   const login = async () => {
     if (!loginId.trim() || !password) {
@@ -60,7 +60,7 @@ function LoginPage() {
       } else {
         localStorage.removeItem("auto_login_enabled");
       }
-      goProducts();
+      goHome();
     } catch (error) {
       if (error.code === "A006") {
         const bannedInfo = parseBannedMessage(error.message);
@@ -162,7 +162,7 @@ function LoginPage() {
           아직 계정이 없으신가요? <Link to="/signup">회원가입</Link>
         </p>
 
-        <p className="login-status">{loading ? "요청 처리 중..." : (message || `토큰 상태: ${isAuthenticated() ? "저장됨" : "없음"}`)}</p>
+        {loading || message ? <p className="login-status">{loading ? "요청 처리 중..." : message}</p> : null}
       </section>
       {loginErrorModal ? (
         <div className="modal-backdrop" role="dialog" aria-modal="true">

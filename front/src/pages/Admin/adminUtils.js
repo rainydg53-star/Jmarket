@@ -24,6 +24,31 @@ export const formatDateTime = (value) => {
   }).format(new Date(value));
 };
 
+export const formatAdminJoinDate = (value) => {
+  if (!value) {
+    return "-";
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "-";
+  }
+  const now = new Date();
+  const sameYear = new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+  }).format(date) === new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+  }).format(now);
+
+  return new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    ...(sameYear ? {} : { year: "numeric" }),
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
+};
+
 export const toDateTimeLocal = (value) => {
   if (!value) {
     return "";
@@ -55,6 +80,8 @@ export const AUDIT_ACTION_LABELS = {
   CATEGORY_DELETE: "카테고리 삭제",
   PRODUCT_DELETE: "상품 강제 삭제",
   AUCTION_CANCEL: "경매 강제 마감",
+  MILEAGE_ADMIN_GRANT: "마일리지 관리자 지급",
+  MILEAGE_ADMIN_DEDUCT: "마일리지 관리자 차감",
   MILEAGE_WITHDRAWAL_COMPLETE: "출금 완료 처리",
   MILEAGE_WITHDRAWAL_REJECT: "출금 반려 처리",
 };

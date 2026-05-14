@@ -2,8 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { api } from "../lib/api";
 import { clearAccessToken } from "../lib/auth";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import { API_BASE_URL } from "../lib/config";
 
 function UserProfilePage() {
   const { userId } = useParams();
@@ -40,6 +39,8 @@ function UserProfilePage() {
     loadProfile();
   }, [loadProfile]);
 
+  const shouldShowMessage = loading || message.includes("실패") || message.includes("불러오는 중");
+
   return (
     <main className="container">
       <h1>사용자 프로필</h1>
@@ -47,9 +48,11 @@ function UserProfilePage() {
         <p className="meta">
           <Link to="/products">상품 목록으로</Link>
         </p>
-        <p className={`page-message ${loading ? "loading" : message.includes("실패") ? "error" : ""}`}>
-          {loading ? "요청 처리 중..." : message}
-        </p>
+        {shouldShowMessage ? (
+          <p className={`page-message ${loading ? "loading" : message.includes("실패") ? "error" : ""}`}>
+            {loading ? "요청 처리 중..." : message}
+          </p>
+        ) : null}
       </div>
 
       {profile ? (
@@ -79,7 +82,9 @@ function UserProfilePage() {
                 {profile.sellingProducts.map((product) => (
                   <li key={product.id} className={`list-item${product.tradeStatus !== "ON_SALE" ? " sold" : ""}`}>
                     {product.thumbnailUrl ? (
-                      <img className="product-list-thumb" src={imageSrc(product.thumbnailUrl)} alt={product.title} />
+                      <Link to={`/products/${product.id}`} className="product-list-thumb-link" aria-label={`${product.title} 상세보기`}>
+                        <img className="product-list-thumb" src={imageSrc(product.thumbnailUrl)} alt={product.title} />
+                      </Link>
                     ) : null}
                     <Link to={`/products/${product.id}`} className="list-title">
                       {product.title}

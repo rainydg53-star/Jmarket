@@ -1,6 +1,5 @@
 import { useId, useState } from "react";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import { API_BASE_URL } from "../lib/config";
 
 const imageSrc = (url) => (url?.startsWith("/uploads/") ? `${API_BASE_URL}${url}` : url);
 

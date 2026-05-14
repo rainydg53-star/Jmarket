@@ -4,8 +4,7 @@ import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { api } from "../lib/api";
 import { clearAccessToken, getAccessToken } from "../lib/auth";
 import { getChatRoomTypeLabel } from "../lib/chatRoomType";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import { API_BASE_URL } from "../lib/config";
 
 function ChatRoomPage() {
   const { roomId } = useParams();
@@ -122,6 +121,12 @@ function ChatRoomPage() {
   const otherNickname = room && me
     ? room.participantAId === me.id ? room.participantBNickname : room.participantANickname
     : "";
+  const shouldShowMessage = loading
+    || message.includes("실패")
+    || message.includes("오류")
+    || message.includes("비활성화")
+    || message.includes("준비")
+    || message.includes("불러오는 중");
 
   const sendMessage = () => {
     if (isTradeCompleted) {
@@ -161,7 +166,7 @@ function ChatRoomPage() {
             {connected ? "실시간 연결" : "연결 대기"}
           </span>
         </div>
-        <p className="chat-room-message">{loading ? "요청 처리 중..." : message}</p>
+        {shouldShowMessage ? <p className="chat-room-message">{loading ? "요청 처리 중..." : message}</p> : null}
         {room ? (
           <div className="chat-room-actions">
             <span className="meta">

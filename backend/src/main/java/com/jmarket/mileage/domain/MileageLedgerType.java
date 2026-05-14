@@ -9,5 +9,7 @@ public enum MileageLedgerType {
     TRANSFER_IN,
     WITHDRAW_REQUEST,
     WITHDRAW_COMPLETE,
-    WITHDRAW_REJECT
+    WITHDRAW_REJECT,
+    ADMIN_GRANT,
+    ADMIN_DEDUCT
 }

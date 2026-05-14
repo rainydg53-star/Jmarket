@@ -8,6 +8,7 @@ import HomePage from "./pages/HomePage";
 import ProductsPage from "./pages/ProductsPage";
 import ProductCreatePage from "./pages/ProductCreatePage";
 import ProductDetailPage from "./pages/ProductDetailPage";
+import ProductEditPage from "./pages/ProductEditPage";
 import TradesPage from "./pages/TradesPage";
 import AuctionsPage from "./pages/AuctionsPage";
 import AuctionProductsPage from "./pages/AuctionProductsPage";
@@ -25,6 +26,7 @@ import UserProfilePage from "./pages/UserProfilePage";
 import { getAccessToken, isAuthenticated, logout as logoutSession } from "./lib/auth";
 import { api, refreshAccessToken } from "./lib/api";
 import { openChatWindow } from "./lib/chatWindow";
+import { API_BASE_URL } from "./lib/config";
 import { resolveNotificationLink } from "./lib/notificationLinks";
 import { canCreateAuction, canCreateProduct, isAdmin } from "./lib/permissions";
 
@@ -264,14 +266,9 @@ function TopNav() {
         <Link to="/" className="brand-link">Jmarket</Link>
         <nav className="top-nav-links" aria-label="주요 메뉴">
           {!authed ? (
-            <>
-              <NavLink to="/login" className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}>
-                로그인
-              </NavLink>
-              <NavLink to="/signup" className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}>
-                회원가입
-              </NavLink>
-            </>
+            <NavLink to="/" end className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}>
+              홈
+            </NavLink>
           ) : (
             <>
               <NavLink to="/" end className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}>
@@ -306,10 +303,23 @@ function TopNav() {
           )}
         </nav>
         <div className="top-nav-right">
-          <span className="nav-status">{authed ? `${welcomeName || "사용자"}님 환영합니다` : "미인증"}</span>
-          {authed && location.pathname !== "/login" ? (
-            <button className="nav-logout" onClick={logout}>로그아웃</button>
-          ) : null}
+          {authed ? (
+            <>
+              <span className="nav-status">{welcomeName || "사용자"}님 환영합니다</span>
+              {location.pathname !== "/login" ? (
+                <button className="nav-logout" onClick={logout}>로그아웃</button>
+              ) : null}
+            </>
+          ) : (
+            <>
+              <NavLink to="/login" className={({ isActive }) => `nav-link nav-auth-link${isActive ? " active" : ""}`}>
+                로그인
+              </NavLink>
+              <NavLink to="/signup" className={({ isActive }) => `nav-link nav-auth-link${isActive ? " active" : ""}`}>
+                회원가입
+              </NavLink>
+            </>
+          )}
         </div>
       </div>
     </header>
@@ -367,8 +377,7 @@ function NotificationToasts() {
         return;
       }
 
-      const baseUrl = import.meta.env.VITE_API_BASE_URL;
-      const streamUrl = `${baseUrl}/api/notifications/stream?accessToken=${encodeURIComponent(token)}`;
+      const streamUrl = `${API_BASE_URL}/api/notifications/stream?accessToken=${encodeURIComponent(token)}`;
       eventSource = new EventSource(streamUrl);
 
       eventSource.addEventListener("notification", (event) => {
@@ -484,6 +493,14 @@ function App() {
               <RequireCapability canAccess={canCreateProduct} message="현재 계정은 상품 등록 기능을 사용할 수 없습니다.">
                 <ProductCreatePage />
               </RequireCapability>
+            </RequireAuth>
+          )}
+        />
+        <Route
+          path="/products/:productId/edit"
+          element={(
+            <RequireAuth>
+              <ProductEditPage />
             </RequireAuth>
           )}
         />

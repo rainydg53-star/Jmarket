@@ -1,27 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import ConfirmModal from "../components/ConfirmModal";
-import ImageDropUploader from "../components/ImageDropUploader";
 import ImageViewerModal from "../components/ImageViewerModal";
 import { api } from "../lib/api";
 import { clearAccessToken } from "../lib/auth";
 import { openChatWindow } from "../lib/chatWindow";
-import { loadCategoryOptions } from "../lib/categories";
+import { API_BASE_URL } from "../lib/config";
 import { canUseUserActions } from "../lib/permissions";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
-const CATEGORY_OPTIONS = [
-  { value: "DIGITAL_APPLIANCE", label: "디지털/가전" },
-  { value: "FASHION", label: "패션/잡화" },
-  { value: "BEAUTY_HEALTH", label: "뷰티/헬스" },
-  { value: "LIVING_INTERIOR", label: "리빙/인테리어" },
-  { value: "LUXURY_WATCH", label: "명품/시계" },
-  { value: "COLLECTIBLE_GOODS", label: "수집품/굿즈" },
-  { value: "SPORTS_LEISURE", label: "스포츠/레저" },
-  { value: "BOOK_TICKET_GOODS", label: "도서/티켓/굿즈" },
-  { value: "ETC", label: "기타" },
-];
 
 const sellerTrustLabel = (product) => {
   const reviewCount = Number(product?.sellerReviewCount || 0);
@@ -36,12 +21,6 @@ function ProductDetailPage() {
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [me, setMe] = useState(null);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("ETC");
-  const [categoryOptions, setCategoryOptions] = useState(CATEGORY_OPTIONS);
-  const [price, setPrice] = useState("");
-  const [images, setImages] = useState([]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [questions, setQuestions] = useState([]);
@@ -69,90 +48,12 @@ function ProductDetailPage() {
     return status;
   };
 
-  const validateProductInput = () => {
-    const trimmedTitle = title.trim();
-    const trimmedDescription = description.replace(/<[^>]*>/g, "").trim();
-    const numericPrice = Number(price);
-
-    if (!trimmedTitle) {
-      return "제목을 입력해주세요.";
-    }
-    if (!trimmedDescription) {
-      return "설명을 입력해주세요.";
-    }
-    if (!Number.isFinite(numericPrice) || Number.isNaN(numericPrice)) {
-      return "가격은 숫자로 입력해주세요.";
-    }
-    if (numericPrice < 0) {
-      return "가격은 0 이상이어야 합니다.";
-    }
-    return null;
-  };
-
   const sanitizeHtml = (html) => html
     .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "")
     .replace(/\son\w+="[^"]*"/gi, "")
     .replace(/\son\w+='[^']*'/gi, "");
 
   const imageSrc = (url) => (url?.startsWith("/uploads/") ? `${API_BASE_URL}${url}` : url);
-
-  const formatDescription = (command, value = null) => {
-    document.execCommand(command, false, value);
-    const editor = document.querySelector("[data-product-editor='detail']");
-    if (editor) {
-      setDescription(editor.innerHTML);
-    }
-  };
-
-  const setThumbnail = (index) => {
-    setImages((prev) => prev.map((image, itemIndex) => ({ ...image, thumbnail: itemIndex === index })));
-  };
-
-  const removeImage = (index) => {
-    setImages((prev) => {
-      const next = prev.filter((_, itemIndex) => itemIndex !== index);
-      if (next.length > 0 && !next.some((image) => image.thumbnail)) {
-        next[0] = { ...next[0], thumbnail: true };
-      }
-      return next;
-    });
-    setActiveImageIndex(0);
-  };
-
-  const uploadImageFiles = async (fileList) => {
-    const selectedFiles = Array.from(fileList || []);
-    if (selectedFiles.length === 0) {
-      return;
-    }
-    const formData = new FormData();
-    selectedFiles.forEach((file) => formData.append("files", file));
-    setLoading(true);
-    try {
-      const uploaded = await api("/api/products/images", {
-        method: "POST",
-        body: formData,
-      });
-      setImages((prev) => {
-        const next = [
-          ...prev,
-          ...uploaded.map((item, index) => ({
-            imageUrl: item.imageUrl,
-            thumbnail: prev.length === 0 && index === 0,
-          })),
-        ];
-        return next;
-      });
-      setMessage("이미지 업로드 성공");
-    } catch (error) {
-      if (error.status === 401) {
-        handleUnauthorized();
-        return;
-      }
-      setMessage(`이미지 업로드 실패: ${error.message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleUnauthorized = useCallback(() => {
     clearAccessToken();
@@ -163,12 +64,7 @@ function ProductDetailPage() {
     try {
       const response = await api(`/api/products/${productId}`);
       setProduct(response);
-      setTitle(response.title);
-      setDescription(response.description);
-      setCategory(response.category || "ETC");
-      setImages(response.images || []);
       setActiveImageIndex(0);
-      setPrice(String(response.price));
       setMessage("상품 상세 조회 성공");
     } catch (error) {
       if (error.status === 401) {
@@ -216,40 +112,6 @@ function ProductDetailPage() {
       }
     }
   }, [handleUnauthorized, productId]);
-
-  const updateProduct = async () => {
-    const validationMessage = validateProductInput();
-    if (validationMessage) {
-      setMessage(validationMessage);
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await api(`/api/products/${productId}`, {
-        method: "PUT",
-        body: JSON.stringify({
-          title: title.trim(),
-          description: description.trim(),
-          category,
-          price: Number(price),
-          images: images
-            .map((image) => ({ imageUrl: image.imageUrl.trim(), thumbnail: image.thumbnail }))
-            .filter((image) => image.imageUrl),
-        }),
-      });
-      setMessage("상품 수정 성공");
-      await loadProduct();
-    } catch (error) {
-      if (error.status === 401) {
-        handleUnauthorized();
-        return;
-      }
-      setMessage(`상품 수정 실패: ${error.message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const toggleFavorite = async () => {
     setLoading(true);
@@ -398,9 +260,6 @@ function ProductDetailPage() {
     loadProduct();
     loadMyTradeForProduct();
     loadQuestions();
-    loadCategoryOptions()
-      .then(setCategoryOptions)
-      .catch((error) => setMessage(`카테고리 조회 실패: ${error.message}`));
   }, [loadMe, loadMyTradeForProduct, loadProduct, loadQuestions]);
 
   const isSeller = Boolean(me && product && me.id === product.sellerId);
@@ -410,12 +269,16 @@ function ProductDetailPage() {
   const hasActiveTrade = Boolean(
     myTradeForProduct && (myTradeForProduct.status === "REQUESTED" || myTradeForProduct.status === "ACCEPTED")
   );
-  const visibleImages = images.filter((image) => image.imageUrl);
+  const visibleImages = (product?.images || []).filter((image) => image.imageUrl);
   const activeImage = visibleImages[activeImageIndex] || visibleImages[0];
   const viewerImages = visibleImages.map((image, index) => ({
     src: imageSrc(image.imageUrl),
     alt: `${product?.title ?? "상품"} ${index + 1}`,
   }));
+  const shouldShowMessage = loading
+    || message.includes("실패")
+    || message.includes("오류")
+    || message.includes("불러오는 중");
 
   return (
     <main className="container">
@@ -424,7 +287,7 @@ function ProductDetailPage() {
         <p className="meta">
           <Link to="/products">목록으로</Link>
         </p>
-        <p>{message}</p>
+        {shouldShowMessage ? <p>{loading ? "요청 처리 중..." : message}</p> : null}
       </div>
 
       {product ? (
@@ -472,40 +335,11 @@ function ProductDetailPage() {
             </div>
           ) : null}
 
-          <label>제목</label>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} disabled={loading || !isSeller} />
-
-          <label>설명</label>
-          {isSeller ? (
-            <>
-              <div className="editor-toolbar">
-                <button type="button" onClick={() => formatDescription("bold")} disabled={loading}>굵게</button>
-                <button type="button" onClick={() => formatDescription("foreColor", "#dc2626")} disabled={loading}>빨강</button>
-                <button type="button" onClick={() => formatDescription("foreColor", "#2563eb")} disabled={loading}>파랑</button>
-              </div>
-              <div
-                className="rich-editor"
-                contentEditable={!loading}
-                data-product-editor="detail"
-                dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }}
-                onInput={(e) => setDescription(e.currentTarget.innerHTML)}
-                suppressContentEditableWarning
-              />
-            </>
-          ) : (
-            <div
-              className="product-description"
-              dangerouslySetInnerHTML={{ __html: sanitizeHtml(product.description) }}
-            />
-          )}
-
-          <label>가격</label>
-          <input
-            type="number"
-            min="0"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            disabled={loading || !isSeller}
+          <h2>{product.title}</h2>
+          <p className="price-text">{product.price.toLocaleString()}원</p>
+          <div
+            className="product-description"
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(product.description) }}
           />
 
           <p className="meta">
@@ -514,37 +348,9 @@ function ProductDetailPage() {
           <p className="meta">카테고리: {product.categoryLabel}</p>
           <p className="meta">조회수: {product.viewCount.toLocaleString()} · 찜: {product.favoriteCount.toLocaleString()}</p>
           {product.tradeStatusLabel ? <p className="meta">상태: {product.tradeStatusLabel}</p> : null}
-          {!isSeller ? <p className="meta">판매자만 수정/삭제할 수 있습니다.</p> : null}
-
-          {isSeller ? (
-            <>
-              <label>카테고리</label>
-              <select
-                className="select"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                disabled={loading}
-              >
-                {categoryOptions.map((option) => (
-                  <option key={option.value} value={option.value}>{option.label}</option>
-                ))}
-              </select>
-
-              <label>상품 이미지</label>
-              <ImageDropUploader
-                images={images}
-                inputName="product-detail-images"
-                loading={loading}
-                onUpload={uploadImageFiles}
-                onRemove={removeImage}
-                onSetThumbnail={setThumbnail}
-              />
-            </>
-          ) : null}
-
           {isSeller ? (
             <div className="actions">
-              <button onClick={updateProduct} disabled={loading}>수정</button>
+              <button type="button" onClick={() => navigate(`/products/${productId}/edit`)} disabled={loading}>수정하기</button>
               <button className="danger-button" onClick={() => setShowDeleteModal(true)} disabled={loading}>삭제</button>
             </div>
           ) : canActAsUser ? (

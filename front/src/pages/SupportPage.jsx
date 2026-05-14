@@ -255,13 +255,21 @@ function SupportPage() {
       setMinorCategory("");
     }
   }, [majorCategory, categories, minorCategory]);
+  const shouldShowMessage = loading
+    || message.includes("실패")
+    || message.includes("입력")
+    || message.includes("선택")
+    || message.includes("완료")
+    || message.includes("불러오는 중");
 
   return (
     <main className="container">
       <h1>1:1 상담</h1>
-      <p className={`page-message ${loading ? "loading" : message.includes("실패") ? "error" : ""}`}>
-        {loading ? "요청 처리 중..." : message}
-      </p>
+      {shouldShowMessage ? (
+        <p className={`page-message ${loading ? "loading" : message.includes("실패") ? "error" : ""}`}>
+          {loading ? "요청 처리 중..." : message}
+        </p>
+      ) : null}
 
       {showCreate ? (
         <div className="card">

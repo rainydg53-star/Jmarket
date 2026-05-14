@@ -136,6 +136,7 @@
   gap: 8px;
   margin-left: auto;
   min-width: 0;
+  flex-shrink: 0;
 }
 
 .nav-status {
@@ -175,6 +176,10 @@
 .nav-logout {
   font-size: 12px;
   padding: 6px 10px;
+}
+
+.nav-auth-link {
+  min-height: 34px;
 }
 
 h1 {
@@ -817,7 +822,19 @@ pre {
   place-items: center;
 }
 
-.image-viewer-stage img {
+.image-viewer-image-button {
+  display: flex;
+  max-width: 100%;
+  max-height: min(72vh, 760px);
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-out;
+}
+
+.image-viewer-image-button img {
   max-width: 100%;
   max-height: min(72vh, 760px);
   object-fit: contain;
@@ -956,6 +973,13 @@ pre {
   height: auto;
   border-radius: 8px;
   margin: 8px 0;
+}
+
+.price-text {
+  margin: 8px 0 14px;
+  color: #111827;
+  font-size: 22px;
+  font-weight: 800;
 }
 
 .image-input-list {
@@ -2545,6 +2569,11 @@ pre {
   font-size: 18px;
 }
 
+.admin-mileage-actions {
+  justify-content: flex-end;
+  margin: -2px 0 12px;
+}
+
 .dashboard-trends {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3555,7 +3584,7 @@ button:disabled {
 
 .admin-user-table th:nth-child(1),
 .admin-user-table td:nth-child(1) {
-  width: 20%;
+  width: 18%;
 }
 
 .admin-user-table th:nth-child(2),
@@ -3574,13 +3603,13 @@ button:disabled {
 .admin-user-table td:nth-child(5),
 .admin-user-table th:nth-child(8),
 .admin-user-table td:nth-child(8) {
-  width: 10%;
+  width: 12%;
   text-align: center;
 }
 
 .admin-user-table th:nth-child(6),
 .admin-user-table td:nth-child(6) {
-  width: 12%;
+  width: 10%;
   white-space: nowrap;
 }
 
@@ -3594,6 +3623,11 @@ button:disabled {
 .admin-user-table td {
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.admin-user-table th:nth-child(8),
+.admin-user-table td:nth-child(8) {
+  overflow: visible;
 }
 
 .admin-user-table tbody tr:nth-child(even) td {
@@ -3845,6 +3879,35 @@ form > .meta,
   align-items: end;
 }
 
+.admin-user-search {
+  align-items: center;
+}
+
+.admin-user-search input,
+.admin-user-search select,
+.admin-user-search button {
+  align-self: center;
+  height: 40px;
+  min-height: 40px;
+  max-height: 40px;
+  line-height: normal;
+  padding-right: 12px;
+  padding-left: 12px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.admin-user-search button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.admin-user-search input {
+  transform: translateY(6px);
+}
+
 .signup-email-row input,
 .admin-user-search input,
 .admin-user-search select,
@@ -3858,6 +3921,17 @@ form > .meta,
 .admin-category-form button {
   min-height: 40px;
   white-space: nowrap;
+}
+
+.admin-user-edit-grid label {
+  align-content: start;
+  grid-template-rows: auto 40px;
+}
+
+.admin-user-edit-grid input,
+.admin-user-edit-grid select {
+  height: 40px;
+  width: 100%;
 }
 
 .filter-bar label {

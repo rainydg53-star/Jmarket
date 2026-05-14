@@ -3,13 +3,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import ImageViewerModal from "../components/ImageViewerModal";
 import { api } from "../lib/api";
-import { getAuctionDisplayStatusInfo, getAuctionRemainingTimeInfo, isAuctionTimeExpired } from "../lib/auctionStatus";
+import { getAuctionDisplayStatusInfo, getAuctionRemainingTimeInfo, isAuctionTimeExpired, isAuctionWaitingToStart } from "../lib/auctionStatus";
 import { clearAccessToken, getAccessToken } from "../lib/auth";
 import { openChatWindow } from "../lib/chatWindow";
+import { API_BASE_URL } from "../lib/config";
 import { canBidAuction, canUseUserActions } from "../lib/permissions";
 import { parseRestrictionMessage } from "../lib/restriction";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const formatNumber = (value) => Number(value ?? 0).toLocaleString();
 
 function AuctionBidTrendChart({ bids, startPrice, formatKst }) {
@@ -233,7 +233,7 @@ function AuctionDetailPage() {
       setMessage("경매 정보를 아직 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
       return;
     }
-    if (auction.status !== "OPEN" || isAuctionTimeExpired(auction)) {
+    if (auction.status !== "OPEN" || isAuctionTimeExpired(auction) || isAuctionWaitingToStart(auction)) {
       setMessage(getBidFailureMessage({ code: "U004" }, { auction, minimumBid }));
       await loadAuction();
       await loadBids();
@@ -434,8 +434,9 @@ function AuctionDetailPage() {
   const isWinner = Boolean(me && auction && auction.winnerUserId && me.id === auction.winnerUserId);
   const isTopBidder = Boolean(me && auction && auction.currentHighestBidderId && me.id === auction.currentHighestBidderId);
   const timeExpired = isAuctionTimeExpired(auction, now);
+  const waitingToStart = isAuctionWaitingToStart(auction, now);
   const isOpen = auction?.status === "OPEN";
-  const canBidNow = isOpen && !timeExpired && canBidAsUser;
+  const canBidNow = isOpen && !waitingToStart && !timeExpired && canBidAsUser;
   const isClosed = auction?.status === "CLOSED";
   const hasWinner = Boolean(auction?.winnerUserId);
   const canReviewAuction = Boolean(
@@ -477,24 +478,28 @@ function AuctionDetailPage() {
   const shouldShowMessage = loading || Boolean(message);
   const auctionTimerId = auction?.id;
   const auctionTimerStatus = auction?.status;
+  const auctionTimerStartAt = auction?.startAt;
   const auctionTimerEndAt = auction?.endAt;
 
   useEffect(() => {
-    if (!auctionTimerId || auctionTimerStatus !== "OPEN" || !auctionTimerEndAt) {
+    if (!auctionTimerId || auctionTimerStatus !== "OPEN") {
       return undefined;
     }
-    const endTime = new Date(auctionTimerEndAt).getTime();
-    if (!Number.isFinite(endTime)) {
+    const startTime = auctionTimerStartAt ? new Date(auctionTimerStartAt).getTime() : NaN;
+    const endTime = auctionTimerEndAt ? new Date(auctionTimerEndAt).getTime() : NaN;
+    const currentTime = Date.now();
+    const targetTime = Number.isFinite(startTime) && startTime > currentTime ? startTime : endTime;
+    if (!Number.isFinite(targetTime)) {
       return undefined;
     }
-    const delay = Math.max(0, endTime - Date.now() + 1000);
+    const delay = Math.max(0, targetTime - currentTime + 1000);
     const timer = window.setTimeout(() => {
-      setMessage("경매 마감 시간이 지나 상태를 확인하는 중입니다.");
+      setMessage(targetTime === startTime ? "" : "경매 마감 시간이 지나 상태를 확인하는 중입니다.");
       loadAuction();
       loadBids();
     }, delay);
     return () => window.clearTimeout(timer);
-  }, [auctionTimerId, auctionTimerStatus, auctionTimerEndAt, loadAuction, loadBids]);
+  }, [auctionTimerId, auctionTimerStatus, auctionTimerStartAt, auctionTimerEndAt, loadAuction, loadBids]);
 
   const detailLabels = {
     pageTitle: "경매 상세",
@@ -514,6 +519,7 @@ function AuctionDetailPage() {
     notSet: "없음",
     minimumBid: "최소 입찰가(1.1배)",
     topBidder: "최고 입찰자",
+    startAt: "시작 시간(KST)",
     endAt: "종료 시간(KST)",
     topBidderNotice: "현재 최고 입찰자입니다. 추가 입찰은 불가합니다.",
     winner: "낙찰자",
@@ -629,6 +635,7 @@ function AuctionDetailPage() {
           </p>
           <p className="meta">{detailLabels.minimumBid}: {formatNumber(minimumBid)}{detailLabels.won}</p>
           <p className="meta">{detailLabels.topBidder}: {auction.currentHighestBidderNickname ?? "-"}</p>
+          <p className="meta">{detailLabels.startAt}: {formatKst(auction.startAt)}</p>
           <p className="meta">{detailLabels.endAt}: {formatKst(auction.endAt)}</p>
           {isTopBidder ? <p className="meta">{detailLabels.topBidderNotice}</p> : null}
           {auction.winnerNickname ? (
@@ -681,6 +688,16 @@ function AuctionDetailPage() {
                 <span className="result-badge">마감 확인중</span>
                 <h3>경매 마감 시간이 지났습니다.</h3>
                 <p className="meta">자동 마감 처리 결과를 확인하고 있습니다. 잠시 후 낙찰자와 정산 상태가 반영됩니다.</p>
+              </div>
+            </div>
+          ) : null}
+
+          {waitingToStart ? (
+            <div className="auction-result-panel">
+              <div>
+                <span className="result-badge">진행 대기중</span>
+                <h3>아직 경매가 시작되지 않았습니다.</h3>
+                <p className="meta">시작 시간: {formatKst(auction.startAt)}</p>
               </div>
             </div>
           ) : null}

@@ -64,6 +64,7 @@ export default function AdminPage() {
   const [confirmModal, setConfirmModal] = useState(null);
   const [resultModal, setResultModal] = useState(null);
   const [withdrawalRejectModal, setWithdrawalRejectModal] = useState(null);
+  const [mileageAdjustModal, setMileageAdjustModal] = useState(null);
   const [userEditModal, setUserEditModal] = useState(null);
   const [userSearch, setUserSearch] = useState(initialFilters.userSearch);
   const [message, setMessage] = useState("관리자 데이터를 불러오는 중입니다.");
@@ -257,6 +258,50 @@ export default function AdminPage() {
       reason: "운영 정책 위반",
       until: "",
     });
+  };
+
+  const openMileageAdjustModal = (user) => {
+    setMileageAdjustModal({
+      userId: user.id,
+      userNickname: user.nickname,
+      availableMileage: user.availableMileage ?? 0,
+      type: "GRANT",
+      amount: "",
+      reason: "사기 피해 보상",
+    });
+  };
+
+  const submitMileageAdjustModal = async () => {
+    if (!mileageAdjustModal) {
+      return;
+    }
+    const amount = Number(mileageAdjustModal.amount);
+    const reason = mileageAdjustModal.reason.trim();
+    if (!Number.isFinite(amount) || amount <= 0) {
+      showResult("입력 확인", "마일리지 금액은 1P 이상 입력해주세요.");
+      return;
+    }
+    if (!reason) {
+      showResult("입력 확인", "마일리지 조정 사유를 입력해주세요.");
+      return;
+    }
+    setLoading(true);
+    try {
+      await api(`/api/admin/users/${mileageAdjustModal.userId}/mileage-adjustments`, {
+        method: "POST",
+        body: JSON.stringify({
+          type: mileageAdjustModal.type,
+          amount: Math.floor(amount),
+          reason,
+        }),
+      });
+      setMileageAdjustModal(null);
+      setUserEditModal(null);
+      await refreshAfterAction("마일리지 조정 완료", "회원 마일리지가 조정되었습니다.");
+    } catch (error) {
+      setLoading(false);
+      showResult("마일리지 조정 실패", error.message);
+    }
   };
 
   const submitRestrictionModal = async () => {
@@ -515,12 +560,65 @@ export default function AdminPage() {
           onSubmit={submitUserEditModal}
           onClose={() => setUserEditModal(null)}
           onRestrict={openFeatureRestrictionModal}
+          onAdjustMileage={openMileageAdjustModal}
           products={products}
           auctions={auctions}
           restrictions={restrictions}
           reports={reports}
           auditLogs={auditLogs}
         />
+      ) : null}
+
+      {mileageAdjustModal ? (
+        <div className="modal-backdrop" role="dialog" aria-modal="true">
+          <div className="modal-card">
+            <h2>마일리지 조정</h2>
+            <p className="meta">
+              대상: {mileageAdjustModal.userNickname} #{mileageAdjustModal.userId} · 사용 가능 {Number(mileageAdjustModal.availableMileage).toLocaleString()}P
+            </p>
+            <label>조정 유형</label>
+            <select
+              value={mileageAdjustModal.type}
+              onChange={(e) => setMileageAdjustModal((prev) => ({ ...prev, type: e.target.value }))}
+              disabled={loading}
+            >
+              <option value="GRANT">지급</option>
+              <option value="DEDUCT">차감</option>
+            </select>
+            <label>금액</label>
+            <input
+              type="number"
+              min="1"
+              step="1"
+              value={mileageAdjustModal.amount}
+              onChange={(e) => setMileageAdjustModal((prev) => ({ ...prev, amount: e.target.value }))}
+              disabled={loading}
+              placeholder="예: 10000"
+            />
+            <label>사유</label>
+            <textarea
+              className="textarea"
+              value={mileageAdjustModal.reason}
+              onChange={(e) => setMileageAdjustModal((prev) => ({ ...prev, reason: e.target.value }))}
+              disabled={loading}
+              maxLength={500}
+            />
+            <p className="meta">조정 내역은 회원 마일리지 내역과 관리자 감사 로그에 남습니다.</p>
+            <div className="actions">
+              <button type="button" className="secondary-button" onClick={() => setMileageAdjustModal(null)} disabled={loading}>
+                취소
+              </button>
+              <button
+                type="button"
+                className={mileageAdjustModal.type === "DEDUCT" ? "danger-button" : undefined}
+                onClick={submitMileageAdjustModal}
+                disabled={loading}
+              >
+                {loading ? "처리 중..." : mileageAdjustModal.type === "DEDUCT" ? "차감 처리" : "지급 처리"}
+              </button>
+            </div>
+          </div>
+        </div>
       ) : null}
 
       {restrictionModal ? (

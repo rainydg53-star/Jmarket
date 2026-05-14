@@ -4,9 +4,8 @@ import { api } from "../lib/api";
 import { clearAccessToken } from "../lib/auth";
 import { openChatWindow } from "../lib/chatWindow";
 import { getChatRoomTypeLabel } from "../lib/chatRoomType";
+import { API_BASE_URL } from "../lib/config";
 import { getTradeStatusTone } from "../lib/statusTone";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const SIDE_MENUS = [
   { key: "PURCHASE", label: "구매내역" },

@@ -37,7 +37,7 @@ function SocialCallbackPage() {
         });
         setAccessToken(response.accessToken);
         localStorage.removeItem(`social_state_${normalizedProvider}`);
-        navigate("/products", { replace: true });
+        navigate("/", { replace: true });
       } catch (error) {
         setMessage(`소셜 로그인 실패: ${error.message}`);
       } finally {

@@ -1,4 +1,4 @@
-import { formatDateTime, formatNumber, ROLE_OPTIONS, STATUS_OPTIONS } from "./adminUtils";
+import { formatAdminJoinDate, formatDateTime, formatNumber, ROLE_OPTIONS, STATUS_OPTIONS } from "./adminUtils";
 
 export default function AdminUsersSection({ users, filteredUsers, userSearch, setUserSearch, loading, updateUserRole, openUserEditModal, unbanUser, openLoginBanModal }) {
   return (
@@ -72,7 +72,7 @@ export default function AdminUsersSection({ users, filteredUsers, userSearch, se
                         {user.banned ? "차단" : "정상"}
                       </span>
                     </td>
-                    <td>{formatDateTime(user.createdAt)}</td>
+                    <td title={formatDateTime(user.createdAt)}>{formatAdminJoinDate(user.createdAt)}</td>
                     <td>
                       <strong>{formatNumber(user.availableMileage)} P</strong>
                       <span className="meta">보유 {formatNumber(user.mileageBalance)} · 예약 {formatNumber(user.reservedMileage)}</span>

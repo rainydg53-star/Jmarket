@@ -27,6 +27,7 @@ export default function AdminUserDetailModal({
   onSubmit,
   onClose,
   onRestrict,
+  onAdjustMileage,
   products,
   auctions,
   restrictions,
@@ -157,6 +158,11 @@ export default function AdminUserDetailModal({
                 <span className="meta">예약</span>
                 <strong>{formatNumber(userEditModal.reservedMileage)} P</strong>
               </div>
+            </div>
+            <div className="actions admin-mileage-actions">
+              <button type="button" onClick={() => onAdjustMileage(userEditModal)} disabled={loading}>
+                마일리지 조정
+              </button>
             </div>
             <label className="inline-check">
               <input

@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "./config";
+
 const ACCESS_TOKEN_KEY = "accessToken";
 
 export function getAccessToken() {
@@ -18,7 +20,7 @@ export function isAuthenticated() {
 
 export async function logout() {
   try {
-    await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/logout`, {
+    await fetch(`${API_BASE_URL}/api/auth/logout`, {
       method: "POST",
       credentials: "include",
     });

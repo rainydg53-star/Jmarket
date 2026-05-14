@@ -50,7 +50,14 @@ export default function ImageViewerModal({
               {"<"}
             </button>
           ) : null}
-          <img src={activeImage.src} alt={activeImage.alt || title} />
+          <button
+            type="button"
+            className="image-viewer-image-button"
+            onClick={onClose}
+            aria-label="이미지 보기 닫기"
+          >
+            <img src={activeImage.src} alt={activeImage.alt || title} />
+          </button>
           {hasMultiple ? (
             <button type="button" className="image-viewer-nav next" onClick={() => move(1)} aria-label="다음 이미지">
               {">"}

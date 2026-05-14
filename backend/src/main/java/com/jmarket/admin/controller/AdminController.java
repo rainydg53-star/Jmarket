@@ -15,6 +15,9 @@ import com.jmarket.admin.dto.AdminUserRoleRequest;
 import com.jmarket.admin.dto.AdminUserUpdateRequest;
 import com.jmarket.admin.service.AdminAuditService;
 import com.jmarket.admin.service.AdminService;
+import com.jmarket.mileage.dto.MileageAccountResponse;
+import com.jmarket.mileage.dto.MileageAdminAdjustmentRequest;
+import com.jmarket.mileage.dto.MileageAdminAdjustmentType;
 import com.jmarket.mileage.dto.MileageWithdrawalRejectRequest;
 import com.jmarket.mileage.dto.MileageWithdrawalResponse;
 import com.jmarket.mileage.service.MileageService;
@@ -87,6 +90,20 @@ public class AdminController {
     @PatchMapping("/users/{userId}/unban")
     public AdminUserResponse unbanUser(@PathVariable Long userId, Principal principal) {
         return adminService.unbanUser(userId, principal.getName());
+    }
+
+    @PostMapping("/users/{userId}/mileage-adjustments")
+    public MileageAccountResponse adjustUserMileage(
+            @PathVariable Long userId,
+            @Valid @RequestBody MileageAdminAdjustmentRequest request,
+            Principal principal
+    ) {
+        MileageAccountResponse response = mileageService.adjustMileageByAdmin(userId, request);
+        String action = request.type() == MileageAdminAdjustmentType.GRANT
+                ? "MILEAGE_ADMIN_GRANT"
+                : "MILEAGE_ADMIN_DEDUCT";
+        auditService.log(principal.getName(), action, "USER", userId, request.amount() + "P · " + request.reason());
+        return response;
     }
 
     @GetMapping("/restrictions")

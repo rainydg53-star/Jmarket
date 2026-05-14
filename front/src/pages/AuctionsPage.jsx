@@ -30,8 +30,8 @@ function AuctionsPage() {
   const [startAt, setStartAt] = useState("");
   const [endAt, setEndAt] = useState("");
   const [restrictionModal, setRestrictionModal] = useState(null);
+  const [modalMessage, setModalMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("경매 정보를 입력한 뒤 등록해주세요.");
 
   const handleUnauthorized = () => {
     clearAccessToken();
@@ -50,7 +50,7 @@ function AuctionsPage() {
             : currentCategory
         ));
       })
-      .catch((error) => setMessage(`카테고리 조회 실패: ${error.message}`));
+      .catch((error) => setModalMessage(`카테고리 조회 실패: ${error.message}`));
     return () => {
       active = false;
     };
@@ -125,13 +125,12 @@ function AuctionsPage() {
         ];
         return next.length > 0 ? next : [{ imageUrl: "", thumbnail: true }];
       });
-      setMessage("이미지 업로드 성공");
     } catch (error) {
       if (error.status === 401) {
         handleUnauthorized();
         return;
       }
-      setMessage(`이미지 업로드 실패: ${error.message}`);
+      setModalMessage(`이미지 업로드 실패: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -140,7 +139,7 @@ function AuctionsPage() {
   const createAuction = async () => {
     const validationMessage = validateAuctionInput();
     if (validationMessage) {
-      setMessage(validationMessage);
+      setModalMessage(validationMessage);
       return;
     }
 
@@ -169,7 +168,6 @@ function AuctionsPage() {
       setImages([{ imageUrl: "", thumbnail: true }]);
       setStartAt("");
       setEndAt("");
-      setMessage("경매 등록 성공");
       navigate(`/auctions/${createdAuction.id}`, { replace: true });
     } catch (error) {
       if (error.status === 401) {
@@ -178,10 +176,9 @@ function AuctionsPage() {
       }
       if (error.code === "A007") {
         setRestrictionModal(parseRestrictionMessage(error.message));
-        setMessage("");
         return;
       }
-      setMessage(`경매 등록 실패: ${error.message}`);
+      setModalMessage(`경매 등록 실패: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -190,12 +187,6 @@ function AuctionsPage() {
   return (
     <main className="container">
       <h1>경매등록</h1>
-      {message ? (
-        <p className={`page-message ${loading ? "loading" : message.includes("실패") ? "error" : ""}`}>
-          {loading ? "요청 처리 중..." : message}
-        </p>
-      ) : null}
-
       <div className="card">
         <h2>상품 + 경매 정보 입력</h2>
         <label>상품명</label>
@@ -275,6 +266,17 @@ function AuctionsPage() {
             {restrictionModal.restrictedUntil ? <p>해제 예정: {restrictionModal.restrictedUntil}</p> : null}
             <div className="actions">
               <button type="button" onClick={() => setRestrictionModal(null)}>확인</button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+      {modalMessage ? (
+        <div className="modal-backdrop" role="dialog" aria-modal="true">
+          <div className="modal-card">
+            <h2>확인</h2>
+            <p>{modalMessage}</p>
+            <div className="actions">
+              <button type="button" onClick={() => setModalMessage("")}>확인</button>
             </div>
           </div>
         </div>

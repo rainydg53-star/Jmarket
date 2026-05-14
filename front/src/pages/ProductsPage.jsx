@@ -3,9 +3,9 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../lib/api";
 import { clearAccessToken } from "../lib/auth";
 import { loadCategoryOptions } from "../lib/categories";
+import { API_BASE_URL } from "../lib/config";
 import { canCreateProduct, isAdmin } from "../lib/permissions";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const RECENT_SEARCH_KEY = "jmarket:recent-product-searches";
 
 const CATEGORY_OPTIONS = [
