@@ -1,0 +1,44 @@
+# Environment
+.env
+.env.*
+.env.example
+*.env.example
+
+# Logs / runtime files
+logs/
+*.log
+*.pid
+*.out.log
+*.err.log
+
+# Frontend
+front/node_modules/
+front/dist/
+front/dist-ssr/
+front/.env
+front/.env.*
+
+# Backend / Gradle
+backend/.gradle/
+backend/build/
+backend/bin/
+backend/out/
+backend/.env
+backend/.env.*
+!backend/gradle/wrapper/gradle-wrapper.jar
+
+# Uploaded local files
+backend/uploads/
+
+# IDE / OS
+.vscode/
+.idea/
+*.iml
+*.iws
+*.ipr
+.DS_Store
+Thumbs.db
+
+# Python cache for portfolio scripts
+__pycache__/
+*.py[cod]
