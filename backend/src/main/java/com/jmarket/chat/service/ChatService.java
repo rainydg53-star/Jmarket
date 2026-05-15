@@ -171,7 +171,7 @@ public class ChatService {
     }
 
     private void validateParticipantOrAdmin(ChatRoom room, User user) {
-        if (user.getRole() == UserRole.ADMIN) {
+        if (user.getRole().canAccessAdmin()) {
             return;
         }
         validateParticipant(room, user);

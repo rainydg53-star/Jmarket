@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import ConfirmModal from "../../components/ConfirmModal";
 import { api } from "../../lib/api";
+import { canManageRoles } from "../../lib/permissions";
 import AdminAuditSection from "./AdminAuditSection";
 import AdminCategoriesSection from "./AdminCategoriesSection";
 import AdminDashboardSection from "./AdminDashboardSection";
@@ -13,6 +14,7 @@ import AdminUsersSection from "./AdminUsersSection";
 import AdminWithdrawalsSection from "./AdminWithdrawalsSection";
 import { RESTRICTION_LABELS, ROLE_OPTIONS, STATUS_OPTIONS, toDateTimeLocal } from "./adminUtils";
 
+import "../../css/pages/AdminPage.css";
 const ADMIN_TABS = new Set(["dashboard", "users", "restrictions", "categories", "operations", "withdrawals", "audit"]);
 const USER_SEARCH_FIELDS = new Set(["email", "nickname", "name", "phoneNumber"]);
 
@@ -67,6 +69,7 @@ export default function AdminPage() {
   const [mileageAdjustModal, setMileageAdjustModal] = useState(null);
   const [userEditModal, setUserEditModal] = useState(null);
   const [userSearch, setUserSearch] = useState(initialFilters.userSearch);
+  const [currentAdmin, setCurrentAdmin] = useState(null);
   const [message, setMessage] = useState("관리자 데이터를 불러오는 중입니다.");
   const [loading, setLoading] = useState(false);
 
@@ -102,7 +105,8 @@ export default function AdminPage() {
   const loadAdminData = async ({ silent = false } = {}) => {
     setLoading(true);
     try {
-      const [dashboardRes, usersRes, categoriesRes, productsRes, auctionsRes, restrictionsRes, reportsRes, logsRes, withdrawalsRes] = await Promise.all([
+      const [meRes, dashboardRes, usersRes, categoriesRes, productsRes, auctionsRes, restrictionsRes, reportsRes, logsRes, withdrawalsRes] = await Promise.all([
+        api("/api/auth/me"),
         api("/api/admin/dashboard"),
         api("/api/admin/users"),
         api("/api/admin/categories"),
@@ -113,6 +117,7 @@ export default function AdminPage() {
         api("/api/admin/audit-logs"),
         api("/api/admin/mileage/withdrawals"),
       ]);
+      setCurrentAdmin(meRes);
       setDashboard(dashboardRes);
       setUsers(usersRes);
       setCategories(categoriesRes);
@@ -540,7 +545,7 @@ export default function AdminPage() {
 
       {activeTab === "dashboard" ? <AdminDashboardSection dashboard={dashboard} /> : null}
 
-      {activeTab === "users" ? <AdminUsersSection users={users} filteredUsers={filteredUsers} userSearch={userSearch} setUserSearch={updateUserSearch} loading={loading} updateUserRole={updateUserRole} openUserEditModal={openUserEditModal} unbanUser={confirmUnbanUser} openLoginBanModal={openLoginBanModal} /> : null}
+      {activeTab === "users" ? <AdminUsersSection users={users} filteredUsers={filteredUsers} userSearch={userSearch} setUserSearch={updateUserSearch} loading={loading} updateUserRole={updateUserRole} openUserEditModal={openUserEditModal} unbanUser={confirmUnbanUser} openLoginBanModal={openLoginBanModal} canManageRoles={canManageRoles(currentAdmin)} /> : null}
 
       {activeTab === "restrictions" ? <AdminRestrictionsSection restrictions={restrictions} loading={loading} deactivateRestriction={confirmDeactivateRestriction} /> : null}
 
@@ -566,6 +571,7 @@ export default function AdminPage() {
           restrictions={restrictions}
           reports={reports}
           auditLogs={auditLogs}
+          canManageRoles={canManageRoles(currentAdmin)}
         />
       ) : null}
 

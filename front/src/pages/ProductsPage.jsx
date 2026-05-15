@@ -6,6 +6,7 @@ import { loadCategoryOptions } from "../lib/categories";
 import { API_BASE_URL } from "../lib/config";
 import { canCreateProduct, isAdmin } from "../lib/permissions";
 
+import "../css/pages/ProductsPage.css";
 const RECENT_SEARCH_KEY = "jmarket:recent-product-searches";
 
 const CATEGORY_OPTIONS = [

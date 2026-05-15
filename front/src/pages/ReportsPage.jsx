@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../lib/api";
 import { clearAccessToken } from "../lib/auth";
 
+import "../css/pages/ReportsPage.css";
 const STATUS_LABEL = {
   PENDING: "대기",
   RESOLVED: "처리완료",
@@ -75,7 +76,7 @@ function ReportsPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("신고 정보를 불러오는 중...");
 
-  const isAdmin = me?.role === "ADMIN";
+  const isAdmin = me?.role === "ADMIN" || me?.role === "SUPER_ADMIN";
   const viewMode = searchParams.get("mode") === "list" ? "list" : "create";
   const showCreate = !isAdmin && viewMode === "create";
   const showList = isAdmin || viewMode === "list";
@@ -167,14 +168,16 @@ function ReportsPage() {
     try {
       const meRes = await api("/api/auth/me");
       setMe(meRes);
-      const list = await api(meRes.role === "ADMIN" ? "/api/admin/reports" : "/api/reports/me");
+      const adminLike = meRes.role === "ADMIN" || meRes.role === "SUPER_ADMIN";
+      const list = await api(adminLike ? "/api/admin/reports" : "/api/reports/me");
       setReports(list);
       const reportIdFromUrl = searchParams.get("reportId");
       if (reportIdFromUrl) {
         const numericReportId = Number(reportIdFromUrl);
         if (Number.isFinite(numericReportId)) {
           setSelectedId(numericReportId);
-          const detailPath = meRes.role === "ADMIN" ? `/api/admin/reports/${numericReportId}` : `/api/reports/${numericReportId}`;
+          const adminLike = meRes.role === "ADMIN" || meRes.role === "SUPER_ADMIN";
+          const detailPath = adminLike ? `/api/admin/reports/${numericReportId}` : `/api/reports/${numericReportId}`;
           const detail = await api(detailPath);
           setSelected(detail);
           setResolveStatus(detail.status === "PENDING" ? "RESOLVED" : detail.status);

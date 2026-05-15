@@ -6,6 +6,7 @@ import { clearAccessToken, getAccessToken } from "../lib/auth";
 import { getChatRoomTypeLabel } from "../lib/chatRoomType";
 import { API_BASE_URL } from "../lib/config";
 
+import "../css/pages/ChatRoomPage.css";
 function ChatRoomPage() {
   const { roomId } = useParams();
   const navigate = useNavigate();

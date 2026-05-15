@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
-import { setAccessToken } from "../lib/auth";
 
+import "../css/pages/SignUpPage.css";
 function SignUpPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -16,9 +16,8 @@ function SignUpPage() {
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [modalMessage, setModalMessage] = useState("");
+  const [signupComplete, setSignupComplete] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  const goProducts = () => navigate("/products", { replace: true });
 
   const onChangePhone = (value) => {
     const onlyNumbers = value.replace(/\D/g, "");
@@ -110,7 +109,7 @@ function SignUpPage() {
 
     setLoading(true);
     try {
-      const response = await api("/api/auth/signup", {
+      await api("/api/auth/signup", {
         method: "POST",
         body: JSON.stringify({
           email: email.trim(),
@@ -122,8 +121,8 @@ function SignUpPage() {
           emailVerificationToken,
         }),
       });
-      setAccessToken(response.accessToken);
-      goProducts();
+      setSignupComplete(true);
+      setModalMessage("\uD68C\uC6D0\uAC00\uC785\uC774 \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4. \uB85C\uADF8\uC778\uD574\uC8FC\uC138\uC694.");
     } catch (error) {
       setModalMessage(`회원가입 실패: ${error.message}`);
     } finally {
@@ -188,10 +187,21 @@ function SignUpPage() {
       {modalMessage ? (
         <div className="modal-backdrop" role="dialog" aria-modal="true">
           <div className="modal-card signup-alert-modal">
-            <h2>입력 확인</h2>
+            <h2>{signupComplete ? "\uD68C\uC6D0\uAC00\uC785 \uC644\uB8CC" : "\uC785\uB825 \uD655\uC778"}</h2>
             <p>{modalMessage}</p>
             <div className="actions">
-              <button type="button" onClick={() => setModalMessage("")}>확인</button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (signupComplete) {
+                    navigate("/login", { replace: true });
+                    return;
+                  }
+                  setModalMessage("");
+                }}
+              >
+                {"\uD655\uC778"}
+              </button>
             </div>
           </div>
         </div>

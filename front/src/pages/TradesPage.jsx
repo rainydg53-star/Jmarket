@@ -6,6 +6,7 @@ import { clearAccessToken } from "../lib/auth";
 import { openChatWindow } from "../lib/chatWindow";
 import { getTradeStatusTone } from "../lib/statusTone";
 
+import "../css/pages/TradesPage.css";
 function TradesPage() {
   const navigate = useNavigate();
   const [me, setMe] = useState(null);

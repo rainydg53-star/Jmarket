@@ -33,6 +33,7 @@ export default function AdminUserDetailModal({
   restrictions,
   reports,
   auditLogs,
+  canManageRoles,
 }) {
   const [tab, setTab] = useState("basic");
   const userNickname = userEditModal.nickname;
@@ -139,9 +140,10 @@ export default function AdminUserDetailModal({
               </label>
               <label>
                 역할
-                <select value={userEditModal.role} onChange={(e) => setUserEditModal((prev) => ({ ...prev, role: e.target.value }))}>
+                <select value={userEditModal.role} onChange={(e) => setUserEditModal((prev) => ({ ...prev, role: e.target.value }))} disabled={!canManageRoles}>
                   <option value="USER">USER</option>
                   <option value="ADMIN">ADMIN</option>
+                  <option value="SUPER_ADMIN">SUPER_ADMIN</option>
                 </select>
               </label>
             </div>

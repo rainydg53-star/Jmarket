@@ -4,6 +4,7 @@ import { api } from "../lib/api";
 import { clearAccessToken } from "../lib/auth";
 import { getChatRoomTypeLabel } from "../lib/chatRoomType";
 
+import "../css/pages/ChatRoomsPage.css";
 function ChatRoomsPage() {
   const navigate = useNavigate();
   const location = useLocation();

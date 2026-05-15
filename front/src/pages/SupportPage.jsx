@@ -4,6 +4,7 @@ import { clearAccessToken } from "../lib/auth";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { getSupportStatusTone } from "../lib/statusTone";
 
+import "../css/pages/SupportPage.css";
 const STATUS_LABEL = {
   WAITING: "대기",
   ANSWERED: "답변완료",
@@ -27,7 +28,7 @@ function SupportPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("상담 정보를 불러오는 중...");
 
-  const isAdmin = me?.role === "ADMIN";
+  const isAdmin = me?.role === "ADMIN" || me?.role === "SUPER_ADMIN";
   const viewMode = searchParams.get("mode") === "list" ? "list" : "create";
   const showCreate = !isAdmin && viewMode === "create";
   const showList = isAdmin || viewMode === "list";
@@ -239,7 +240,7 @@ function SupportPage() {
     if (!me) {
       return;
     }
-    loadInquiries(me.role === "ADMIN");
+    loadInquiries(me.role === "ADMIN" || me.role === "SUPER_ADMIN");
   }, [loadInquiries, me]);
 
   useEffect(() => {

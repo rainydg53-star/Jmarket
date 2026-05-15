@@ -10,6 +10,7 @@ import { API_BASE_URL } from "../lib/config";
 import { canBidAuction, canUseUserActions } from "../lib/permissions";
 import { parseRestrictionMessage } from "../lib/restriction";
 
+import "../css/pages/AuctionDetailPage.css";
 const formatNumber = (value) => Number(value ?? 0).toLocaleString();
 
 function AuctionBidTrendChart({ bids, startPrice, formatKst }) {

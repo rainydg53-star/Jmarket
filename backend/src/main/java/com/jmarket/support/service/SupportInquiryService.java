@@ -176,6 +176,6 @@ public class SupportInquiryService {
     }
 
     private boolean isAdmin(User user) {
-        return user.getRole() == UserRole.ADMIN;
+        return user.getRole().canAccessAdmin();
     }
 }

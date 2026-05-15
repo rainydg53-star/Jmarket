@@ -107,7 +107,7 @@ public class ReportService {
         User user = findUserByEmail(currentUserEmail);
         Report report = findReportById(reportId);
 
-        if (user.getRole() != UserRole.ADMIN && !report.getReporter().getId().equals(user.getId())) {
+        if (!user.getRole().canAccessAdmin() && !report.getReporter().getId().equals(user.getId())) {
             throw new JmarketException(ErrorCode.FORBIDDEN);
         }
         return toResponse(report);
@@ -261,7 +261,7 @@ public class ReportService {
     }
 
     private void validateAdmin(User user) {
-        if (user.getRole() != UserRole.ADMIN) {
+        if (!user.getRole().canAccessAdmin()) {
             throw new JmarketException(ErrorCode.FORBIDDEN);
         }
     }

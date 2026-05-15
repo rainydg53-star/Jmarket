@@ -4,6 +4,7 @@ import { api } from "../lib/api";
 import { clearAccessToken } from "../lib/auth";
 import { API_BASE_URL } from "../lib/config";
 
+import "../css/pages/UserProfilePage.css";
 function UserProfilePage() {
   const { userId } = useParams();
   const navigate = useNavigate();

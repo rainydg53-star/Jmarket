@@ -14,6 +14,7 @@ import com.jmarket.notification.dto.NotificationType;
 import com.jmarket.report.domain.Report;
 import com.jmarket.review.domain.UserReview;
 import com.jmarket.trade.domain.Trade;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -172,7 +173,7 @@ public class NotificationEventService {
     }
 
     public void notifyMileageWithdrawalRequested(MileageWithdrawal withdrawal) {
-        for (User admin : userRepository.findAllByRole(UserRole.ADMIN)) {
+        for (User admin : userRepository.findAllByRoleIn(List.of(UserRole.ADMIN, UserRole.SUPER_ADMIN))) {
             Notification notification = notificationService.create(
                     admin.getId(),
                     NotificationType.MILEAGE_WITHDRAWAL_REQUESTED,

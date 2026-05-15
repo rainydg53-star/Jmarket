@@ -25,7 +25,7 @@ public class DefaultAccountInitializer implements CommandLineRunner {
     @Value("${app.seed.admin-password:1}")
     private String adminPassword;
 
-    @Value("${app.seed.admin-nickname:관리자}")
+    @Value("${app.seed.admin-nickname:슈퍼관리자}")
     private String adminNickname;
 
     @Value("${app.seed.user-id:2}")
@@ -34,7 +34,7 @@ public class DefaultAccountInitializer implements CommandLineRunner {
     @Value("${app.seed.user-password:2}")
     private String userPassword;
 
-    @Value("${app.seed.user-nickname:회원2}")
+    @Value("${app.seed.user-nickname:관리자}")
     private String userNickname;
 
     @Value("${app.seed.user3-id:3}")
@@ -72,8 +72,8 @@ public class DefaultAccountInitializer implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
-        ensureUser(adminId, adminPassword, adminNickname, UserRole.ADMIN);
-        ensureUser(userId, userPassword, userNickname, UserRole.USER);
+        ensureUser(adminId, adminPassword, adminNickname, UserRole.SUPER_ADMIN);
+        ensureUser(userId, userPassword, userNickname, UserRole.ADMIN);
         ensureUser(user3Id, user3Password, user3Nickname, UserRole.USER);
         ensureUser(user4Id, user4Password, user4Nickname, UserRole.USER);
         ensureUser(user5Id, user5Password, user5Nickname, UserRole.USER);

@@ -58,7 +58,7 @@ export const toDateTimeLocal = (value) => {
   return new Date(date.getTime() - offset).toISOString().slice(0, 16);
 };
 
-export const ROLE_OPTIONS = ["ALL", "USER", "ADMIN"];
+export const ROLE_OPTIONS = ["ALL", "USER", "ADMIN", "SUPER_ADMIN"];
 export const STATUS_OPTIONS = ["ALL", "NORMAL", "BANNED"];
 
 export const RESTRICTION_LABELS = {

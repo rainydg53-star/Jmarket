@@ -3,7 +3,11 @@ export function hasRestriction(user, restrictionType) {
 }
 
 export function isAdmin(user) {
-  return user?.role === "ADMIN";
+  return user?.role === "ADMIN" || user?.role === "SUPER_ADMIN";
+}
+
+export function canManageRoles(user) {
+  return user?.role === "SUPER_ADMIN";
 }
 
 export function canCreateProduct(user) {

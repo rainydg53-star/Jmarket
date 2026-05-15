@@ -336,6 +336,7 @@ public class AdminService {
 
     @Transactional
     public AdminUserResponse updateUserRole(Long userId, AdminUserRoleRequest request, String adminEmail) {
+        requireRoleManager(adminEmail);
         User user = findUser(userId);
         UserRole role = parseRole(request.role());
         user.changeRole(role);
@@ -354,7 +355,12 @@ public class AdminService {
         user.changeNickname(nickname);
         user.changeName(trimToNull(request.name()));
         user.changePhoneNumber(trimToNull(request.phoneNumber()));
-        user.changeRole(parseRole(request.role()));
+        UserRole nextRole = parseRole(request.role());
+        if (user.getRole() != nextRole) {
+            requireRoleManager(adminEmail);
+            user.changeRole(nextRole);
+            auditService.log(adminEmail, "USER_ROLE_UPDATE", "USER", userId, "role=" + nextRole.name());
+        }
 
         if (Boolean.TRUE.equals(request.banned())) {
             String reason = request.banReason() == null || request.banReason().isBlank()
@@ -553,6 +559,14 @@ public class AdminService {
             return UserRole.valueOf(rawRole.trim().toUpperCase(Locale.ROOT));
         } catch (Exception ex) {
             throw new JmarketException(ErrorCode.INVALID_INPUT);
+        }
+    }
+
+    private void requireRoleManager(String adminEmail) {
+        User admin = userRepository.findByEmail(adminEmail)
+                .orElseThrow(() -> new JmarketException(ErrorCode.USER_NOT_FOUND));
+        if (!admin.getRole().canManageRoles()) {
+            throw new JmarketException(ErrorCode.FORBIDDEN);
         }
     }
 

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
 import { getNotificationLinkLabel, resolveNotificationLink } from "../lib/notificationLinks";
 
+import "../css/pages/NotificationsPage.css";
 const TYPE_LABELS = {
   AUCTION_OUTBID: "상위입찰",
   AUCTION_OUTBID_LOST: "입찰밀림",

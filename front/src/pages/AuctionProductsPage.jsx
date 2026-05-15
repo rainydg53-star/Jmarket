@@ -1,3 +1,4 @@
+import "../css/pages/AuctionProductsPage.css";
 ﻿import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../lib/api";

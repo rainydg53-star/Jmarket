@@ -1,0 +1,231 @@
+/* Styles used by SupportPage. */
+
+.admin-container {
+  max-width: 1180px;
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat-card {
+  margin-bottom: 0;
+}
+
+.stat-card strong {
+  display: block;
+  font-size: 28px;
+  color: #111827;
+}
+
+.admin-two-column {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.admin-category-form {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) minmax(160px, 1fr) 110px auto auto;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.admin-category-form input {
+  margin-bottom: 0;
+}
+
+.admin-list {
+  max-height: 720px;
+  overflow: auto;
+}
+
+.admin-section-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.admin-section-head h2 {
+  margin-bottom: 4px;
+}
+
+.admin-user-search {
+  display: grid;
+  grid-template-columns: 130px minmax(180px, 1fr) 130px 130px auto;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.admin-user-search input,
+.admin-user-search select {
+  margin-bottom: 0;
+}
+
+.admin-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.admin-user-table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.admin-user-table th,
+.admin-user-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+
+.admin-user-table th {
+  background: #f9fafb;
+  color: #374151;
+  font-size: 13px;
+}
+
+.admin-user-table td {
+  color: #111827;
+  font-size: 14px;
+}
+
+.admin-user-table td .meta {
+  display: block;
+  margin-top: 4px;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.status-badge.success {
+  color: #047857;
+  background: #d1fae5;
+}
+
+.status-badge.danger {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.status-badge.muted {
+  color: #4b5563;
+  background: #e5e7eb;
+}
+
+.status-badge.warning {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.auction-time-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.auction-time-badge.success {
+  color: #047857;
+  background: #d1fae5;
+}
+
+.auction-time-badge.warning {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.auction-time-badge.danger {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.auction-time-badge.muted {
+  color: #4b5563;
+  background: #e5e7eb;
+}
+
+.report-detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.report-detail-head h2 {
+  margin-bottom: 4px;
+}
+
+.report-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 12px 0 16px;
+}
+
+.report-summary-grid > div,
+.report-resolve-panel {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+  padding: 12px;
+}
+
+.report-summary-grid strong {
+  display: block;
+  margin-top: 4px;
+  color: #111827;
+  font-size: 17px;
+}
+
+.report-resolve-panel {
+  margin: 14px 0;
+}
+
+.report-resolve-panel h3 {
+  margin-bottom: 8px;
+}
+
+.report-target-display {
+  display: block;
+  min-height: 42px;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+  border: 1px solid var(--jm-border);
+  border-radius: var(--jm-radius);
+  background: var(--jm-surface-muted);
+}
+
+.report-target-display strong {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--jm-text);
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+

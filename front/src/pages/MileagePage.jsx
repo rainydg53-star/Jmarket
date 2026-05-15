@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../lib/api";
 import { clearAccessToken } from "../lib/auth";
 
+import "../css/pages/MileagePage.css";
 const BANK_OPTIONS = [
   "계좌없음",
   "광주은행",
@@ -50,8 +51,6 @@ function MileagePage() {
   const [ledger, setLedger] = useState([]);
   const [payments, setPayments] = useState([]);
   const [withdrawals, setWithdrawals] = useState([]);
-  const [chargeAmount, setChargeAmount] = useState("");
-  const [useAmount, setUseAmount] = useState("");
   const [payAmount, setPayAmount] = useState("");
   const [withdrawForm, setWithdrawForm] = useState({
     amount: "",
@@ -123,31 +122,6 @@ function MileagePage() {
     return Math.floor(amount);
   };
 
-  const charge = async () => {
-    const amount = validateAmount(chargeAmount);
-    if (!amount) {
-      openModal("입력 확인", "충전 금액은 1원 이상이어야 합니다.");
-      return;
-    }
-    setLoading(true);
-    try {
-      await api("/api/mileage/charge", {
-        method: "POST",
-        body: JSON.stringify({ amount }),
-      });
-      setChargeAmount("");
-      await loadMileage();
-      openModal("충전 완료", "마일리지 충전이 완료되었습니다.");
-    } catch (error) {
-      if (error.status === 401) {
-        handleUnauthorized();
-        return;
-      }
-      openModal("충전 실패", error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const startKakaoPayCharge = async () => {
     const amount = validateAmount(payAmount);
@@ -173,31 +147,6 @@ function MileagePage() {
     }
   };
 
-  const useMileage = async () => {
-    const amount = validateAmount(useAmount);
-    if (!amount) {
-      openModal("입력 확인", "사용 금액은 1원 이상이어야 합니다.");
-      return;
-    }
-    setLoading(true);
-    try {
-      await api("/api/mileage/use", {
-        method: "POST",
-        body: JSON.stringify({ amount }),
-      });
-      setUseAmount("");
-      await loadMileage();
-      openModal("사용 완료", "마일리지 사용이 완료되었습니다.");
-    } catch (error) {
-      if (error.status === 401) {
-        handleUnauthorized();
-        return;
-      }
-      openModal("사용 실패", error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const requestWithdrawal = async () => {
     const amount = validateAmount(withdrawForm.amount);
@@ -335,13 +284,6 @@ function MileagePage() {
         {shouldShowMessage ? <p>{loading ? "요청 처리 중..." : message}</p> : null}
       </div>
 
-      <div className="card">
-        <h2>충전</h2>
-        <input type="number" min="1" value={chargeAmount} onChange={(e) => setChargeAmount(e.target.value)} disabled={loading} placeholder="충전 금액" />
-        <div className="actions">
-          <button onClick={charge} disabled={loading}>충전하기</button>
-        </div>
-      </div>
 
       <div className="card">
         <h2>카카오페이 충전</h2>
@@ -351,14 +293,6 @@ function MileagePage() {
         </div>
       </div>
 
-      <div className="card">
-        <h2>사용</h2>
-        <input type="number" min="1" value={useAmount} onChange={(e) => setUseAmount(e.target.value)} disabled={loading} placeholder="사용 금액" />
-        <div className="actions">
-          <button onClick={useMileage} disabled={loading}>사용하기</button>
-          <button className="secondary-button" onClick={loadMileage} disabled={loading}>새로고침</button>
-        </div>
-      </div>
 
       <div className="card">
         <h2>출금 요청</h2>

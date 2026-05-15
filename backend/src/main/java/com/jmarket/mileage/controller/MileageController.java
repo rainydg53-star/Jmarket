@@ -9,6 +9,7 @@ import com.jmarket.mileage.dto.MileageWithdrawalResponse;
 import com.jmarket.mileage.service.MileageService;
 import jakarta.validation.Valid;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +35,7 @@ public class MileageController {
     }
 
     @PostMapping("/charge")
+    @PreAuthorize("hasRole('ADMIN')")
     public MileageAccountResponse charge(
             @Valid @RequestBody MileageChargeRequest request,
             @AuthenticationPrincipal(expression = "username") String email
@@ -42,6 +44,7 @@ public class MileageController {
     }
 
     @PostMapping("/use")
+    @PreAuthorize("hasRole('ADMIN')")
     public MileageAccountResponse use(
             @Valid @RequestBody MileageUseRequest request,
             @AuthenticationPrincipal(expression = "username") String email

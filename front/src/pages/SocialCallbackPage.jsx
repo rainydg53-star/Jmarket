@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom"
 import { api } from "../lib/api";
 import { setAccessToken } from "../lib/auth";
 
+import "../css/pages/SocialCallbackPage.css";
 function SocialCallbackPage() {
   const navigate = useNavigate();
   const { provider } = useParams();

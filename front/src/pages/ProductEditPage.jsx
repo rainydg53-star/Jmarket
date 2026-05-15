@@ -6,6 +6,7 @@ import { api } from "../lib/api";
 import { clearAccessToken } from "../lib/auth";
 import { loadCategoryOptions } from "../lib/categories";
 
+import "../css/pages/ProductEditPage.css";
 const CATEGORY_OPTIONS = [
   { value: "DIGITAL_APPLIANCE", label: "디지털/가전" },
   { value: "FASHION", label: "패션/잡화" },

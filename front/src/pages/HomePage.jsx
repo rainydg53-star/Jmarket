@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { api } from "../lib/api";
 import { API_BASE_URL } from "../lib/config";
 
+import "../css/pages/HomePage.css";
 const imageSrc = (url) => (url?.startsWith("/uploads/") ? `${API_BASE_URL}${url}` : url);
 
 const formatPrice = (value) => `${Number(value ?? 0).toLocaleString()}원`;

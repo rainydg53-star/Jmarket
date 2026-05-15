@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../lib/api";
 
+import "../css/pages/FindAccountPage.css";
 function FindAccountPage() {
   const [tab, setTab] = useState("id");
   const [name, setName] = useState("");

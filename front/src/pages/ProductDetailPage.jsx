@@ -8,6 +8,7 @@ import { openChatWindow } from "../lib/chatWindow";
 import { API_BASE_URL } from "../lib/config";
 import { canUseUserActions } from "../lib/permissions";
 
+import "../css/pages/ProductDetailPage.css";
 const sellerTrustLabel = (product) => {
   const reviewCount = Number(product?.sellerReviewCount || 0);
   if (reviewCount === 0) {

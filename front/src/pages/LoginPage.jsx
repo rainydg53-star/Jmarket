@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
 import { setAccessToken } from "../lib/auth";
 
+import "../css/pages/LoginPage.css";
 const formatKoreanDateTime = (value) => {
   if (!value) {
     return null;
@@ -33,10 +34,11 @@ const parseBannedMessage = (message) => {
 
 function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
   const [autoLogin, setAutoLogin] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(location.state?.message || "");
   const [loginErrorModal, setLoginErrorModal] = useState(null);
   const [loading, setLoading] = useState(false);
 

@@ -1,6 +1,6 @@
 import { formatAdminJoinDate, formatDateTime, formatNumber, ROLE_OPTIONS, STATUS_OPTIONS } from "./adminUtils";
 
-export default function AdminUsersSection({ users, filteredUsers, userSearch, setUserSearch, loading, updateUserRole, openUserEditModal, unbanUser, openLoginBanModal }) {
+export default function AdminUsersSection({ users, filteredUsers, userSearch, setUserSearch, loading, updateUserRole, openUserEditModal, unbanUser, openLoginBanModal, canManageRoles }) {
   return (
         <section className="card">
           <div className="admin-section-head">
@@ -58,14 +58,18 @@ export default function AdminUsersSection({ users, filteredUsers, userSearch, se
                     <td>{user.name ?? "-"} / {user.nickname}</td>
                     <td>{user.phoneNumber ?? "-"}</td>
                     <td>
-                      <button
-                        type="button"
-                        className="mini-button"
-                        onClick={() => updateUserRole(user.id, user.role === "ADMIN" ? "USER" : "ADMIN")}
-                        disabled={loading}
-                      >
-                        {user.role}
-                      </button>
+                      {canManageRoles ? (
+                        <button
+                          type="button"
+                          className="mini-button"
+                          onClick={() => updateUserRole(user.id, user.role === "ADMIN" || user.role === "SUPER_ADMIN" ? "USER" : "ADMIN")}
+                          disabled={loading}
+                        >
+                          {user.role}
+                        </button>
+                      ) : (
+                        <span className="status-badge muted">{user.role}</span>
+                      )}
                     </td>
                     <td>
                       <span className={`status-badge ${user.banned ? "danger" : "success"}`}>
