@@ -104,7 +104,7 @@
   box-shadow: 0 14px 30px rgba(15, 23, 42, 0.14);
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-4px);
+  transform: translateY(-6px);
   transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
 }
 
@@ -1876,16 +1876,52 @@ pre {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 8px;
-  align-items: start;
+  align-items: center;
 }
 
 .signup-email-row input {
-  margin-bottom: 12px;
+  height: 40px;
+  margin-bottom: 0;
 }
 
 .signup-email-row button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: 40px;
   min-height: 40px;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  line-height: 1;
   white-space: nowrap;
+}
+
+.signup-email-row--signup button {
+  transform: translateY(-6px);
+}
+
+.find-email-row button {
+  transform: none;
+}
+
+.find-email-row .login-input {
+  height: 40px;
+  min-height: 40px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.find-email-row .login-primary-btn {
+  height: 40px;
+  min-height: 40px;
+  margin: 0;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-size: 16px;
+  line-height: 1;
+  align-self: center;
 }
 
 .signup-alert-modal p {
@@ -3876,7 +3912,7 @@ form > .meta,
 .signup-email-row,
 .admin-user-search,
 .admin-category-form {
-  align-items: end;
+  align-items: center;
 }
 
 .admin-user-search {
@@ -3921,6 +3957,25 @@ form > .meta,
 .admin-category-form button {
   min-height: 40px;
   white-space: nowrap;
+}
+
+.find-email-row {
+  align-items: center;
+}
+
+.find-email-row .login-input,
+.find-email-row .login-primary-btn {
+  align-self: center;
+  height: 40px;
+  min-height: 40px;
+  max-height: 40px;
+  margin: 0;
+}
+
+.find-email-row .login-primary-btn {
+  width: auto;
+  padding: 0 14px;
+  transform: translateY(-6px);
 }
 
 .admin-user-edit-grid label {

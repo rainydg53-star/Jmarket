@@ -136,14 +136,14 @@ function SignUpPage() {
       <h1>회원가입</h1>
       <div className="card">
         <label>이메일(아이디)</label>
-        <div className="signup-email-row">
+        <div className="signup-email-row signup-email-row--signup">
           <input value={email} onChange={(e) => onChangeEmail(e.target.value)} disabled={loading} />
           <button type="button" onClick={sendEmailCode} disabled={loading || !email.trim()}>
             인증 코드 발송
           </button>
         </div>
         {emailCodeSent ? (
-          <div className="signup-email-row">
+          <div className="signup-email-row signup-email-row--signup">
             <input
               value={emailCode}
               onChange={(e) => setEmailCode(e.target.value.replace(/\D/g, "").slice(0, 6))}

@@ -145,7 +145,7 @@ function FindAccountPage() {
   const renderPasswordReset = () => (
     <>
       <label htmlFor="find-email">이메일</label>
-      <div className="signup-email-row">
+      <div className="signup-email-row find-email-row">
         <input
           id="find-email"
           className="login-input"
@@ -165,7 +165,7 @@ function FindAccountPage() {
       </div>
 
       {emailCodeSent ? (
-        <div className="signup-email-row">
+        <div className="signup-email-row find-email-row">
           <input
             className="login-input"
             value={emailCode}
