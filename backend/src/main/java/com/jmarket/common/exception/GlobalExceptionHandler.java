@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -42,6 +43,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
         return ResponseEntity.badRequest()
                 .body(new ErrorResponse(ErrorCode.INVALID_INPUT.code(), ErrorCode.INVALID_INPUT.message(), java.time.LocalDateTime.now()));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex) {
+        return ResponseEntity.badRequest()
+                .body(new ErrorResponse(
+                        ErrorCode.INVALID_INPUT.code(),
+                        "\uC774\uBBF8\uC9C0\uB294 \uD30C\uC77C\uB2F9 5MB, \uD55C \uBC88\uC5D0 50MB \uC774\uD558\uB85C \uC5C5\uB85C\uB4DC\uD574 \uC8FC\uC138\uC694.",
+                        java.time.LocalDateTime.now()
+                ));
     }
 
     @ExceptionHandler(Exception.class)
