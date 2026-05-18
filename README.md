@@ -319,108 +319,47 @@ Jmarket
 
 ---
 
-## Quick Start
+## Live Demo / Local Run
 
-### 1. Clone
+### Live Demo
 
-```bash
-git clone https://github.com/your-username/Jmarket.git
-cd Jmarket
-```
+| 구분 | 주소 |
+| --- | --- |
+| 배포 사이트 | [http://3.34.44.26](http://3.34.44.26) |
 
-### 2. Environment
+> 개인 학습 및 포트폴리오 목적의 배포 환경입니다. 테스트 데이터는 변경될 수 있습니다.
 
-```bash
-cp .env.example .env
-```
+### Local Run
 
-필요한 값은 로컬 환경에 맞게 수정합니다.
-
-```env
-DB_URL=jdbc:mysql://localhost:3307/jmarket?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
-DB_USERNAME=jmarket
-DB_PASSWORD=1234
-REDIS_HOST=localhost
-REDIS_PORT=6379
-SERVER_PORT=8081
-```
-
-### 3. Docker Compose
+로컬 실행은 인프라 실행 후 백엔드와 프론트를 각각 실행합니다.
 
 ```bash
+# infra
 cd infra
 docker compose up -d
-```
 
-실행되는 주요 서비스:
-
-| 서비스 | 기본 포트 |
-| --- | --- |
-| MySQL | `3307` |
-| Redis | `6379` |
-| Elasticsearch | `9200` |
-
-### 4. Backend
-
-```bash
-cd backend
+# backend
+cd ../backend
 ./gradlew bootRun
-```
 
-Windows 환경:
-
-```bash
-cd backend
-gradlew.bat bootRun
-```
-
-Backend 기본 주소:
-
-```text
-http://localhost:8081
-```
-
-### 5. Frontend
-
-```bash
-cd front
+# frontend
+cd ../front
 npm install
 npm run dev
 ```
 
-Frontend 기본 주소:
-
-```text
-http://localhost:5173
-```
-
-### 6. Build Check
-
-```bash
-cd backend
-./gradlew build
-```
-
-```bash
-cd front
-npm run build
-```
+| 구분 | 기본 주소 |
+| --- | --- |
+| Frontend | `http://localhost:5173` |
+| Backend | `http://localhost:8081` |
 
 ---
 
 ## Deployment Notes
 
-- 프론트만 수정한 경우: `front` 빌드 결과 재배포
-- 백엔드 API/DTO/도메인 수정이 있는 경우: 백엔드 재빌드 및 서버 재시작
-- DB 컬럼 추가가 필요한 경우: 운영 DB 스키마 확인
-- WebSocket, Redis, MySQL 환경변수는 운영 서버 설정과 일치해야 함
-
-최근 백엔드 변경 예시:
-
-- 거래 취소 시 채팅 읽기 전용 전환
-- 경매 숨김 처리 및 복구
-- 관리자 상품 운영에서 경매 상품 제외
-- 채팅방 목록에 상품명 표시
+- 프론트 변경: 정적 빌드 파일 재배포
+- 백엔드 변경: 서버 재빌드 및 재시작
+- DB 변경: 운영 DB 스키마 확인
 
 ---
 
