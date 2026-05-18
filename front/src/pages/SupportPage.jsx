@@ -26,6 +26,7 @@ function SupportPage() {
   const [answerContent, setAnswerContent] = useState("");
   const [nextStatus, setNextStatus] = useState("WAITING");
   const [loading, setLoading] = useState(false);
+  const [modalState, setModalState] = useState({ open: false, title: "", body: "" });
   const [message, setMessage] = useState("상담 정보를 불러오는 중...");
 
   const isAdmin = me?.role === "ADMIN" || me?.role === "SUPER_ADMIN";
@@ -44,6 +45,10 @@ function SupportPage() {
     clearAccessToken();
     navigate("/login", { replace: true });
   }, [navigate]);
+
+  const openModal = useCallback((title, body) => {
+    setModalState({ open: true, title, body });
+  }, []);
 
   const formatDateTime = (value) => {
     if (!value) {
@@ -157,6 +162,7 @@ function SupportPage() {
       setContent("");
       setMinorCategory("");
       await loadInquiries(false);
+      openModal("상담 등록 완료", "1:1 상담이 등록되었습니다.");
       setMessage("상담 등록 성공");
     } catch (error) {
       if (error.status === 401) {
@@ -410,6 +416,20 @@ function SupportPage() {
           </select>
           <div className="actions">
             <button onClick={updateStatus} disabled={loading}>상태 변경</button>
+          </div>
+        </div>
+      ) : null}
+
+      {modalState.open ? (
+        <div className="modal-backdrop" role="dialog" aria-modal="true">
+          <div className="modal-card">
+            <h2>{modalState.title}</h2>
+            <p>{modalState.body}</p>
+            <div className="actions">
+              <button type="button" onClick={() => setModalState({ open: false, title: "", body: "" })}>
+                확인
+              </button>
+            </div>
           </div>
         </div>
       ) : null}

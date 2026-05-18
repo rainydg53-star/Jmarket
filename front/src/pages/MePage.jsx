@@ -377,9 +377,13 @@ function MePage() {
       }
       return (
         <ul className="list">
-          {chatRooms.map((room) => (
+          {chatRooms.map((room) => {
+            const roomTitle = room.roomType === "AUCTION_BID" || room.roomType === "AUCTION"
+              ? (room.auctionProductTitle ? `${room.auctionProductTitle} · 경매 #${room.auctionId}` : `경매 #${room.auctionId}`)
+              : (room.tradeProductTitle ? `${room.tradeProductTitle} · 거래 #${room.tradeId}` : `거래 #${room.tradeId}`);
+            return (
             <li key={room.id} className="list-item">
-              <strong>채팅방 #{room.id}</strong>
+              <strong>{roomTitle}</strong>
               <span>타입: {getChatRoomTypeLabel(room.roomType)}</span>
               <span>
                 안읽음: {Number(room.unreadCount ?? 0).toLocaleString()}건 / 최근: {formatShortDateTime(room.lastMessageAt ?? room.createdAt)}
@@ -392,7 +396,8 @@ function MePage() {
                 <button type="button" onClick={() => openChatWindow(room.id)}>채팅방 이동</button>
               </div>
             </li>
-          ))}
+            );
+          })}
         </ul>
       );
     }

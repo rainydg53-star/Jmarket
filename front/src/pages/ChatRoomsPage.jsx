@@ -61,9 +61,11 @@ function ChatRoomsPage() {
 
   const getRoomTarget = (room) => {
     if (room.roomType === "AUCTION_BID" || room.roomType === "AUCTION") {
-      return room.auctionId ? `경매 #${room.auctionId}` : "경매";
+      const title = room.auctionProductTitle || "경매";
+      return room.auctionId ? `${title} · 경매 #${room.auctionId}` : title;
     }
-    return room.tradeId ? `거래 #${room.tradeId}` : getChatRoomTypeLabel(room.roomType);
+    const title = room.tradeProductTitle || getChatRoomTypeLabel(room.roomType);
+    return room.tradeId ? `${title} · 거래 #${room.tradeId}` : title;
   };
   const shouldShowMessage = loading || message.includes("실패") || message.includes("불러오는 중");
 

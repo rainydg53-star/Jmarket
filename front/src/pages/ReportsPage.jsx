@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../lib/api";
 import { clearAccessToken } from "../lib/auth";
@@ -73,6 +73,7 @@ function ReportsPage() {
   const [resolveStatus, setResolveStatus] = useState("RESOLVED");
   const [resolveAction, setResolveAction] = useState("NONE");
   const [resolveMemo, setResolveMemo] = useState("");
+  const [reportStatusFilter, setReportStatusFilter] = useState("PENDING");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("신고 정보를 불러오는 중...");
   const [modalState, setModalState] = useState({ open: false, title: "", body: "" });
@@ -82,6 +83,13 @@ function ReportsPage() {
   const showCreate = !isAdmin && viewMode === "create";
   const showList = isAdmin || viewMode === "list";
   const pageTitle = showCreate ? "신고 등록" : isAdmin ? "전체 신고 관리" : "내 신고 목록";
+
+  const filteredReports = useMemo(() => {
+    if (!isAdmin) {
+      return reports;
+    }
+    return reports.filter((report) => report.status === reportStatusFilter);
+  }, [isAdmin, reports, reportStatusFilter]);
 
   const handleUnauthorized = useCallback(() => {
     clearAccessToken();
@@ -423,11 +431,26 @@ function ReportsPage() {
         <div className="card">
           <h2>{isAdmin ? "전체 신고 목록" : "내 신고 목록"}</h2>
           <p className="meta">{isAdmin ? "접수된 신고를 확인하고 처리 상태를 저장할 수 있습니다." : "내가 등록한 신고의 처리 상태를 확인할 수 있습니다."}</p>
-          {reports.length === 0 ? (
+          {isAdmin ? (
+            <div className="mode-switch report-status-filter" aria-label="신고 상태 필터">
+              {["PENDING", "RESOLVED", "REJECTED"].map((status) => (
+                <button
+                  key={status}
+                  type="button"
+                  className={reportStatusFilter === status ? "active" : ""}
+                  onClick={() => setReportStatusFilter(status)}
+                  disabled={loading}
+                >
+                  {STATUS_LABEL[status] ?? status}
+                </button>
+              ))}
+            </div>
+          ) : null}
+          {filteredReports.length === 0 ? (
             <p className="empty-box">등록된 신고가 없습니다.</p>
           ) : (
             <ul className="list">
-              {reports.map((report) => {
+              {filteredReports.map((report) => {
                 const targetLink = reportTargetLink(report);
                 const ownerLink = reportOwnerLink(report);
                 const reporterLink = reportReporterLink(report);

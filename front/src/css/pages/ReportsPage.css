@@ -252,3 +252,26 @@
   text-decoration: none;
 }
 
+.report-status-filter {
+  justify-content: flex-start;
+  margin: 12px 0 14px;
+}
+
+.report-status-filter button {
+  min-height: 34px;
+  padding: 8px 14px;
+  border: 1px solid var(--jm-border);
+  border-radius: 999px;
+  background: #ffffff;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.report-status-filter button.active {
+  border-color: #111827;
+  background: #111827;
+  color: #ffffff;
+}
+
