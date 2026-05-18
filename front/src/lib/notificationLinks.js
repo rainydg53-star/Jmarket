@@ -4,10 +4,10 @@ const withReportMode = (link, notification) => {
   const rawText = `${notification?.title ?? ""} ${notification?.message ?? ""}`;
   const match = rawText.match(REPORT_ID_PATTERN);
   const reportId = match?.[1] ?? match?.[2];
-  const params = new URLSearchParams({ mode: "list" });
   if (reportId) {
-    params.set("reportId", reportId);
+    return `/reports/${reportId}`;
   }
+  const params = new URLSearchParams({ mode: "list" });
   return `${link || "/reports"}?${params.toString()}`;
 };
 

@@ -441,10 +441,7 @@ function ReportsPage() {
                     <button
                       type="button"
                       disabled={loading}
-                      onClick={() => {
-                        setSelectedId(report.id);
-                        loadDetail(report.id);
-                      }}
+                      onClick={() => navigate(`/reports/${report.id}`)}
                     >
                       #{report.id} {report.reason}
                     </button>

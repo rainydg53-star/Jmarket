@@ -19,6 +19,7 @@ import ChatRoomPage from "./pages/ChatRoomPage";
 import MileagePage from "./pages/MileagePage";
 import SupportPage from "./pages/SupportPage";
 import ReportsPage from "./pages/ReportsPage";
+import ReportDetailPage from "./pages/ReportDetailPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import SocialCallbackPage from "./pages/SocialCallbackPage";
 import FindAccountPage from "./pages/FindAccountPage";
@@ -588,6 +589,14 @@ function App() {
           element={(
             <RequireAuth>
               <ReportsPage />
+            </RequireAuth>
+          )}
+        />
+        <Route
+          path="/reports/:reportId"
+          element={(
+            <RequireAuth>
+              <ReportDetailPage />
             </RequireAuth>
           )}
         />
