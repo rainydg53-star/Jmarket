@@ -184,6 +184,103 @@
   min-height: 34px;
 }
 
+.app-footer {
+  margin-top: 40px;
+  border-top: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+.app-footer-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 28px 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 28px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.app-footer-brand {
+  display: block;
+  margin-bottom: 14px;
+  color: #111827;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.app-footer-company {
+  min-width: 0;
+}
+
+.app-footer-company p {
+  margin: 0 0 7px;
+  color: #4b5563;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.app-footer-company p:first-of-type {
+  color: #111827;
+  font-weight: 800;
+}
+
+.app-footer-separator {
+  margin: 0 6px;
+  color: #cbd5e1;
+}
+
+.app-footer-copy {
+  margin-top: 16px !important;
+  color: #9ca3af !important;
+}
+
+.app-footer-support {
+  min-width: 180px;
+  display: grid;
+  justify-items: end;
+  align-content: start;
+  color: #111827;
+  text-align: right;
+  text-decoration: none;
+}
+
+.app-footer-support span {
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.app-footer-support strong {
+  display: block;
+  margin: 8px 0 4px;
+  color: #0f4cc9;
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.app-footer-support small {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.app-footer-support:hover span,
+.app-footer-support:focus-visible span {
+  text-decoration: underline;
+}
+
+@media (max-width: 760px) {
+  .app-footer-inner {
+    flex-direction: column;
+  }
+
+  .app-footer-support {
+    min-width: 0;
+    justify-items: start;
+    text-align: left;
+  }
+}
+
 h1 {
   margin-bottom: 16px;
 }
@@ -551,7 +648,13 @@ body {
   backdrop-filter: blur(10px);
 }
 
+.app-footer {
+  border-top-color: var(--jm-border);
+  background: var(--jm-surface);
+}
+
 .brand-link,
+.app-footer-brand,
 .summary-value,
 .stat-card strong,
 .admin-user-table td,

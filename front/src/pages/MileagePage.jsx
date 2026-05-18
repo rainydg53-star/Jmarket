@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../lib/api";
 import { clearAccessToken } from "../lib/auth";
@@ -61,6 +61,10 @@ function MileagePage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("마일리지 정보를 불러오는 중입니다.");
   const [modalState, setModalState] = useState({ open: false, title: "", body: "" });
+
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0 });
+  }, []);
 
   const formatNumber = (value) => Number(value ?? 0).toLocaleString();
 

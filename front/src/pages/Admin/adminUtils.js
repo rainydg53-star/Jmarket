@@ -80,6 +80,7 @@ export const AUDIT_ACTION_LABELS = {
   CATEGORY_DELETE: "카테고리 삭제",
   PRODUCT_DELETE: "상품 강제 삭제",
   AUCTION_CANCEL: "경매 강제 마감",
+  AUCTION_HIDE: "경매 강제 삭제",
   MILEAGE_ADMIN_GRANT: "마일리지 관리자 지급",
   MILEAGE_ADMIN_DEDUCT: "마일리지 관리자 차감",
   MILEAGE_WITHDRAWAL_COMPLETE: "출금 완료 처리",

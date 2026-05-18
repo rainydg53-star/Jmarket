@@ -812,6 +812,45 @@
   overflow: hidden;
 }
 
+.admin-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.admin-section-heading h2 {
+  margin-bottom: 4px;
+}
+
+.admin-inline-filter {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid #dbe3ef;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.admin-inline-filter button {
+  min-height: 28px;
+  padding: 5px 9px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-inline-filter button.active {
+  background: #111827;
+  color: #ffffff;
+}
+
 .admin-list {
   display: flex;
   flex-direction: column;

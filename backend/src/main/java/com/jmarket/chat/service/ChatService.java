@@ -61,6 +61,9 @@ public class ChatService {
         if (!isBuyer && !isSeller) {
             throw new JmarketException(ErrorCode.CHAT_FORBIDDEN_PARTICIPANT);
         }
+        if (isClosedTrade(trade.getStatus())) {
+            throw new JmarketException(ErrorCode.TRADE_INVALID_STATUS);
+        }
 
         Long userA = trade.getBuyer().getId();
         Long userB = trade.getSeller().getId();
@@ -178,9 +181,13 @@ public class ChatService {
     }
 
     private void validateSendableRoom(ChatRoom room) {
-        if (room.getTrade() != null && room.getTrade().getStatus() == TradeStatus.COMPLETED) {
+        if (room.getTrade() != null && isClosedTrade(room.getTrade().getStatus())) {
             throw new JmarketException(ErrorCode.TRADE_INVALID_STATUS);
         }
+    }
+
+    private boolean isClosedTrade(TradeStatus status) {
+        return status == TradeStatus.COMPLETED || status == TradeStatus.CANCELED;
     }
 
     private ChatRoomResponse toRoomResponse(ChatRoom room, Long myUserId) {

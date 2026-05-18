@@ -481,8 +481,7 @@ public class AdminService {
 
     @Transactional(readOnly = true)
     public List<AdminProductResponse> getProducts() {
-        return productRepository.findAll().stream()
-                .sorted(Comparator.comparing(Product::getCreatedAt).reversed())
+        return productRepository.findAllByListingTypeOrderByCreatedAtDesc(ProductListingType.DIRECT).stream()
                 .map(product -> AdminProductResponse.from(product, resolveCategoryLabel(product.getCategoryCode())))
                 .toList();
     }
@@ -541,6 +540,28 @@ public class AdminService {
         auction.cancel();
         auctionBidRedisService.initialize(auction);
         auditService.log(adminEmail, "AUCTION_CANCEL", "AUCTION", auctionId, auction.getProduct().getTitle());
+        return AdminAuctionResponse.from(auction);
+    }
+
+    @Transactional
+    @CacheEvict(cacheNames = {"auctionList", "productList"}, allEntries = true)
+    public void hideAuction(Long auctionId, String adminEmail) {
+        Auction auction = auctionRepository.findByIdForUpdate(auctionId)
+                .orElseThrow(() -> new JmarketException(ErrorCode.AUCTION_NOT_FOUND));
+        if (auction.getStatus() != AuctionStatus.CLOSED) {
+            throw new JmarketException(ErrorCode.AUCTION_NOT_ENDED);
+        }
+        auction.hide();
+        auditService.log(adminEmail, "AUCTION_HIDE", "AUCTION", auctionId, auction.getProduct().getTitle());
+    }
+
+    @Transactional
+    @CacheEvict(cacheNames = {"auctionList", "productList"}, allEntries = true)
+    public AdminAuctionResponse restoreAuction(Long auctionId, String adminEmail) {
+        Auction auction = auctionRepository.findByIdForUpdate(auctionId)
+                .orElseThrow(() -> new JmarketException(ErrorCode.AUCTION_NOT_FOUND));
+        auction.show();
+        auditService.log(adminEmail, "AUCTION_RESTORE", "AUCTION", auctionId, auction.getProduct().getTitle());
         return AdminAuctionResponse.from(auction);
     }
 

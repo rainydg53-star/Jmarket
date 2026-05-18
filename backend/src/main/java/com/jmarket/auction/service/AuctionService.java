@@ -146,7 +146,7 @@ public class AuctionService {
     @Transactional(readOnly = true)
     public List<AuctionResponse> getMyWonAuctions(String currentUserEmail) {
         User currentUser = findUserByEmail(currentUserEmail);
-        return auctionRepository.findAllByStatusAndWinnerUserIdOrderByClosedAtDesc(
+        return auctionRepository.findAllByStatusAndWinnerUserIdAndHiddenFalseOrderByClosedAtDesc(
                         AuctionStatus.CLOSED,
                         currentUser.getId()
                 ).stream()
@@ -157,6 +157,9 @@ public class AuctionService {
     @Transactional(readOnly = true)
     public AuctionResponse getById(Long auctionId) {
         Auction auction = findAuctionById(auctionId);
+        if (auction.isHidden()) {
+            throw new JmarketException(ErrorCode.AUCTION_NOT_FOUND);
+        }
         return toAuctionResponse(auction);
     }
 
@@ -269,7 +272,7 @@ public class AuctionService {
     @Transactional
     @CacheEvict(cacheNames = {"auctionList", "productList"}, allEntries = true)
     public int closeExpiredOpenAuctions() {
-        List<Auction> targets = auctionRepository.findAllByStatusAndEndAtLessThanEqualOrderByEndAtAsc(
+        List<Auction> targets = auctionRepository.findAllByStatusAndEndAtLessThanEqualAndHiddenFalseOrderByEndAtAsc(
                 AuctionStatus.OPEN,
                 Instant.now()
         );

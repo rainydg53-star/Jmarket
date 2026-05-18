@@ -31,7 +31,9 @@ function ProductDetailPage() {
   const [message, setMessage] = useState("상품을 불러오는 중...");
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showMileageModal, setShowMileageModal] = useState(false);
   const [myTradeForProduct, setMyTradeForProduct] = useState(null);
+  const [mileageAccount, setMileageAccount] = useState(null);
 
   const statusLabel = (status) => {
     if (status === "REQUESTED") {
@@ -91,6 +93,17 @@ function ProductDetailPage() {
     try {
       const response = await api("/api/auth/me");
       setMe(response);
+    } catch (error) {
+      if (error.status === 401) {
+        handleUnauthorized();
+      }
+    }
+  }, [handleUnauthorized]);
+
+  const loadMileageAccount = useCallback(async () => {
+    try {
+      const response = await api("/api/mileage/me");
+      setMileageAccount(response);
     } catch (error) {
       if (error.status === 401) {
         handleUnauthorized();
@@ -192,6 +205,13 @@ function ProductDetailPage() {
   const requestTrade = async () => {
     setLoading(true);
     try {
+      const account = await api("/api/mileage/me");
+      setMileageAccount(account);
+      if (Number(account.availableBalance ?? 0) < Number(product?.price ?? 0)) {
+        setShowMileageModal(true);
+        return;
+      }
+
       const payload = {
         productId: Number(productId),
       };
@@ -208,6 +228,10 @@ function ProductDetailPage() {
     } catch (error) {
       if (error.status === 401) {
         handleUnauthorized();
+        return;
+      }
+      if (error.code === "M002" || error.message.includes("마일리지가 부족")) {
+        setShowMileageModal(true);
         return;
       }
       setMessage(`거래 요청 실패: ${error.message}`);
@@ -258,10 +282,11 @@ function ProductDetailPage() {
 
   useEffect(() => {
     loadMe();
+    loadMileageAccount();
     loadProduct();
     loadMyTradeForProduct();
     loadQuestions();
-  }, [loadMe, loadMyTradeForProduct, loadProduct, loadQuestions]);
+  }, [loadMe, loadMileageAccount, loadMyTradeForProduct, loadProduct, loadQuestions]);
 
   const isSeller = Boolean(me && product && me.id === product.sellerId);
   const canActAsUser = canUseUserActions(me);
@@ -404,6 +429,9 @@ function ProductDetailPage() {
           <h2>구매신청</h2>
           <p className="meta">거래금액: {product.price.toLocaleString()}원</p>
           <p className="meta">결제방식: 마일리지(상품가 전액 예약)</p>
+          {mileageAccount ? (
+            <p className="meta">사용 가능 마일리지: {Number(mileageAccount.availableBalance ?? 0).toLocaleString()}P</p>
+          ) : null}
 
           {hasActiveTrade ? <p className="meta">진행중 거래가 있어 새 요청을 보낼 수 없습니다.</p> : null}
 
@@ -482,6 +510,23 @@ function ProductDetailPage() {
           onCancel={() => setShowDeleteModal(false)}
           onConfirm={deleteProduct}
         />
+      ) : null}
+
+      {showMileageModal ? (
+        <div className="modal-backdrop" role="dialog" aria-modal="true">
+          <div className="modal-card">
+            <h2>마일리지 부족</h2>
+            <p>마일리지가 부족합니다. 충전 후 구매신청해주세요.</p>
+            <div className="actions">
+              <button type="button" className="secondary-button" onClick={() => setShowMileageModal(false)}>
+                닫기
+              </button>
+              <button type="button" onClick={() => navigate("/mileage")}>
+                마일리지 충전하러 가기
+              </button>
+            </div>
+          </div>
+        </div>
       ) : null}
 
       {viewerOpen ? (

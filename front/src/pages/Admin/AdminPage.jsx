@@ -121,7 +121,7 @@ export default function AdminPage() {
       setDashboard(dashboardRes);
       setUsers(usersRes);
       setCategories(categoriesRes);
-      setProducts(productsRes);
+      setProducts((productsRes ?? []).filter((product) => product.listingType !== "AUCTION"));
       setAuctions(auctionsRes);
       setRestrictions(restrictionsRes);
       setReports(reportsRes);
@@ -477,6 +477,47 @@ export default function AdminPage() {
     });
   };
 
+  const confirmDeleteAuction = (auction) => {
+    setConfirmModal({
+      title: "경매 숨김 처리",
+      message: `${auction.productTitle} 경매를 관리자 화면과 사용자 화면에서 숨길까요?`,
+      detail: "마감된 경매만 숨김 처리할 수 있으며 입찰/낙찰 이력은 보존됩니다.",
+      confirmLabel: "숨김 처리",
+      onConfirm: async () => {
+        setLoading(true);
+        try {
+          await api(`/api/admin/auctions/${auction.id}`, { method: "DELETE" });
+          setConfirmModal(null);
+          await refreshAfterAction("경매 숨김 처리 완료", "경매가 숨김 처리되었습니다.");
+        } catch (error) {
+          setLoading(false);
+          showResult("경매 숨김 처리 실패", error.message);
+        }
+      },
+    });
+  };
+
+  const confirmRestoreAuction = (auction) => {
+    setConfirmModal({
+      title: "경매 복구",
+      message: `${auction.productTitle} 경매를 다시 노출할까요?`,
+      detail: "복구하면 관리자 경매운영과 사용자 경매 목록에서 다시 확인할 수 있습니다.",
+      confirmLabel: "복구",
+      tone: "success",
+      onConfirm: async () => {
+        setLoading(true);
+        try {
+          await api(`/api/admin/auctions/${auction.id}/restore`, { method: "PATCH" });
+          setConfirmModal(null);
+          await refreshAfterAction("경매 복구 완료", "경매가 다시 노출됩니다.");
+        } catch (error) {
+          setLoading(false);
+          showResult("경매 복구 실패", error.message);
+        }
+      },
+    });
+  };
+
   const confirmCompleteWithdrawal = (withdrawal) => {
     setConfirmModal({
       title: "출금 완료 처리",
@@ -551,7 +592,7 @@ export default function AdminPage() {
 
       {activeTab === "categories" ? <AdminCategoriesSection categories={categories} categoryForm={categoryForm} setCategoryForm={setCategoryForm} loading={loading} createCategory={createCategory} updateCategory={updateCategory} deleteCategory={confirmDeleteCategory} /> : null}
 
-      {activeTab === "operations" ? <AdminOperationsSection products={products} auctions={auctions} loading={loading} deleteProduct={confirmDeleteProduct} cancelAuction={confirmCancelAuction} /> : null}
+      {activeTab === "operations" ? <AdminOperationsSection products={products} auctions={auctions} loading={loading} deleteProduct={confirmDeleteProduct} cancelAuction={confirmCancelAuction} deleteAuction={confirmDeleteAuction} restoreAuction={confirmRestoreAuction} /> : null}
 
       {activeTab === "withdrawals" ? <AdminWithdrawalsSection withdrawals={withdrawals} loading={loading} completeWithdrawal={confirmCompleteWithdrawal} rejectWithdrawal={openWithdrawalRejectModal} /> : null}
 

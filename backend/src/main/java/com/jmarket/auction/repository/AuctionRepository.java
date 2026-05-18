@@ -22,11 +22,11 @@ public interface AuctionRepository extends JpaRepository<Auction, Long>, Auction
 
     long countByStatus(AuctionStatus status);
 
-    List<Auction> findAllByStatusAndWinnerUserIdOrderByClosedAtDesc(AuctionStatus status, Long winnerUserId);
+    List<Auction> findAllByStatusAndWinnerUserIdAndHiddenFalseOrderByClosedAtDesc(AuctionStatus status, Long winnerUserId);
 
-    List<Auction> findAllByStatusAndEndAtLessThanEqualOrderByEndAtAsc(AuctionStatus status, java.time.Instant endAt);
+    List<Auction> findAllByStatusAndEndAtLessThanEqualAndHiddenFalseOrderByEndAtAsc(AuctionStatus status, java.time.Instant endAt);
 
-    List<Auction> findAllByStatusAndClosedAtGreaterThanEqualOrderByClosedAtDesc(
+    List<Auction> findAllByStatusAndClosedAtGreaterThanEqualAndHiddenFalseOrderByClosedAtDesc(
             AuctionStatus status,
             java.time.Instant closedAt
     );

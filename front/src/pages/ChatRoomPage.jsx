@@ -21,7 +21,7 @@ function ChatRoomPage() {
   const [connected, setConnected] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("채팅방을 불러오는 중...");
-  const isTradeCompleted = room?.roomType === "PRODUCT_TRADE" && room?.tradeStatus === "COMPLETED";
+  const isTradeEnded = room?.roomType === "PRODUCT_TRADE" && ["COMPLETED", "CANCELED"].includes(room?.tradeStatus);
 
   const handleUnauthorized = useCallback(() => {
     clearAccessToken();
@@ -60,7 +60,7 @@ function ChatRoomPage() {
     if (!room) {
       return;
     }
-    if (isTradeCompleted) {
+    if (isTradeEnded) {
       return;
     }
 
@@ -102,7 +102,7 @@ function ChatRoomPage() {
       clientRef.current = null;
       setConnected(false);
     };
-  }, [roomId, room, isTradeCompleted, me?.id]);
+  }, [roomId, room, isTradeEnded, me?.id]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -130,8 +130,8 @@ function ChatRoomPage() {
     || message.includes("불러오는 중");
 
   const sendMessage = () => {
-    if (isTradeCompleted) {
-      setMessage("거래가 완료되어 채팅 전송이 비활성화되었습니다.");
+    if (isTradeEnded) {
+      setMessage("거래가 종료되어 채팅 전송이 비활성화되었습니다.");
       return;
     }
     const text = content.trim();
@@ -188,7 +188,7 @@ function ChatRoomPage() {
             </div>
           </div>
         ) : null}
-        {isTradeCompleted ? <p className="meta">거래 완료 상태라 채팅은 읽기 전용입니다.</p> : null}
+        {isTradeEnded ? <p className="meta">거래 종료 상태라 채팅은 읽기 전용입니다.</p> : null}
 
       <section className="chat-conversation" aria-label="메시지">
         {messages.length === 0 ? (
@@ -224,10 +224,10 @@ function ChatRoomPage() {
             }
           }}
           maxLength={2000}
-          disabled={!connected || isTradeCompleted}
-          placeholder={isTradeCompleted ? "거래 완료로 인해 채팅이 비활성화되었습니다." : "메시지를 입력하세요"}
+          disabled={!connected || isTradeEnded}
+          placeholder={isTradeEnded ? "거래 종료로 인해 채팅이 비활성화되었습니다." : "메시지를 입력하세요"}
         />
-        <button onClick={sendMessage} disabled={!connected || isTradeCompleted || !content.trim()}>전송</button>
+        <button onClick={sendMessage} disabled={!connected || isTradeEnded || !content.trim()}>전송</button>
       </div>
       </div>
     </main>

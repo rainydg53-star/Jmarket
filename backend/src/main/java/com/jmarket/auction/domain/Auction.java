@@ -74,6 +74,9 @@ public class Auction {
     @Column
     private Instant closedAt;
 
+    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+    private boolean hidden = false;
+
     protected Auction() {
     }
 
@@ -112,6 +115,14 @@ public class Auction {
         this.winnerUser = null;
         this.winningBidAmount = null;
         this.closedAt = Instant.now();
+    }
+
+    public void hide() {
+        this.hidden = true;
+    }
+
+    public void show() {
+        this.hidden = false;
     }
 
     public Long getId() {
@@ -160,5 +171,9 @@ public class Auction {
 
     public Instant getClosedAt() {
         return closedAt;
+    }
+
+    public boolean isHidden() {
+        return hidden;
     }
 }

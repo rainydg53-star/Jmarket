@@ -75,6 +75,7 @@ function ReportsPage() {
   const [resolveMemo, setResolveMemo] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("신고 정보를 불러오는 중...");
+  const [modalState, setModalState] = useState({ open: false, title: "", body: "" });
 
   const isAdmin = me?.role === "ADMIN" || me?.role === "SUPER_ADMIN";
   const viewMode = searchParams.get("mode") === "list" ? "list" : "create";
@@ -86,6 +87,10 @@ function ReportsPage() {
     clearAccessToken();
     navigate("/login", { replace: true });
   }, [navigate]);
+
+  const openModal = useCallback((title, body) => {
+    setModalState({ open: true, title, body });
+  }, []);
 
   const formatDateTime = (value) => {
     if (!value) {
@@ -111,7 +116,7 @@ function ReportsPage() {
       return { to: `/products/${report.targetId}`, label: "상품 상세 보기" };
     }
     if (report.targetType === "USER") {
-      return { to: `/users/${report.targetId}`, label: "사용자 프로필 보기" };
+      return null;
     }
     if (report.targetType === "CHAT_ROOM") {
       return { to: `/chat/rooms/${report.targetId}`, label: "채팅방 보기" };
@@ -127,6 +132,24 @@ function ReportsPage() {
       return null;
     }
     return { to: `/users/${report.targetOwnerUserId}`, label: "대상 사용자 프로필 보기" };
+  };
+
+  const reportReporterLink = (report) => {
+    if (!report?.reporterId) {
+      return null;
+    }
+    return { to: `/users/${report.reporterId}`, label: "사용자 프로필 보기" };
+  };
+
+  const dedupeLinks = (links) => {
+    const seen = new Set();
+    return links.filter((link) => {
+      if (!link || seen.has(link.to)) {
+        return false;
+      }
+      seen.add(link.to);
+      return true;
+    });
   };
 
   const resolveTargetDisplay = useCallback(async (nextType, nextId) => {
@@ -221,15 +244,15 @@ function ReportsPage() {
   const createReport = async () => {
     const numericTargetId = Number(targetId);
     if (!Number.isFinite(numericTargetId) || numericTargetId <= 0) {
-      setMessage("대상 ID는 1 이상의 숫자여야 합니다.");
+      openModal("입력 확인", "대상 ID는 1 이상의 숫자여야 합니다.");
       return;
     }
     if (!reason.trim()) {
-      setMessage("신고 사유를 입력해주세요.");
+      openModal("입력 확인", "신고 사유를 입력해주세요.");
       return;
     }
     if (!detail.trim()) {
-      setMessage("신고 내용을 입력해주세요.");
+      openModal("입력 확인", "신고 내용을 입력해주세요.");
       return;
     }
 
@@ -249,13 +272,13 @@ function ReportsPage() {
       setTargetId("");
       setTargetDisplay("");
       await loadMeAndReports();
-      setMessage("신고 등록 성공");
+      openModal("신고 등록 완료", "신고가 정상적으로 접수되었습니다.");
     } catch (error) {
       if (error.status === 401) {
         handleUnauthorized();
         return;
       }
-      setMessage(`신고 등록 실패: ${error.message}`);
+      openModal("신고 등록 실패", error.message);
     } finally {
       setLoading(false);
     }
@@ -407,6 +430,12 @@ function ReportsPage() {
               {reports.map((report) => {
                 const targetLink = reportTargetLink(report);
                 const ownerLink = reportOwnerLink(report);
+                const reporterLink = reportReporterLink(report);
+                const actionLinks = dedupeLinks([
+                  targetLink,
+                  ownerLink,
+                  isAdmin ? reporterLink : null,
+                ]);
                 return (
                   <li key={report.id} className="list-item">
                     <button
@@ -430,10 +459,12 @@ function ReportsPage() {
                     <span className="meta">
                       상태: <span className={`status-badge ${getReportStatusTone(report.status)}`}>{STATUS_LABEL[report.status] ?? report.status}</span>
                     </span>
+                    <span className="meta">신고자: {report.reporterNickname} #{report.reporterId}</span>
                     <span className="meta">{formatDateTime(report.createdAt)}</span>
                     <div className="actions">
-                      {targetLink ? <Link to={targetLink.to}>{targetLink.label}</Link> : null}
-                      {ownerLink ? <Link to={ownerLink.to}>{ownerLink.label}</Link> : null}
+                      {actionLinks.map((link) => (
+                        <Link className="report-action-link" to={link.to} key={link.to}>{link.label}</Link>
+                      ))}
                     </div>
                   </li>
                 );
@@ -447,47 +478,48 @@ function ReportsPage() {
         <div className="card report-detail-card">
           <div className="report-detail-head">
             <div>
-              <h2>?? ??</h2>
-              <p className="meta">?? #{selected.id} ? {formatDateTime(selected.createdAt)}</p>
+              <h2>신고 상세</h2>
+              <p className="meta">신고 #{selected.id} · {formatDateTime(selected.createdAt)}</p>
             </div>
             <span className={"status-badge " + getReportStatusTone(selected.status)}>{STATUS_LABEL[selected.status] ?? selected.status}</span>
           </div>
 
           <div className="report-summary-grid">
             <div>
-              <span className="meta">?? ??</span>
+              <span className="meta">신고 대상</span>
               <strong>{formatReportTarget(selected)}</strong>
             </div>
             <div>
-              <span className="meta">?? ?? ??</span>
-              <strong>{selected.targetReportCount ?? 0}?</strong>
+              <span className="meta">대상 누적 신고</span>
+              <strong>{selected.targetReportCount ?? 0}건</strong>
             </div>
             <div>
-              <span className="meta">??? ?? ??</span>
-              <strong>{selected.targetOwnerUserId ? (selected.targetOwnerReportCount ?? 0) + "?" : "-"}</strong>
+              <span className="meta">대상 사용자 누적 신고</span>
+              <strong>{selected.targetOwnerUserId ? (selected.targetOwnerReportCount ?? 0) + "건" : "-"}</strong>
             </div>
           </div>
 
-          <p><strong>???:</strong> {selected.reporterNickname} ({selected.reporterEmail})</p>
-          <p><strong>?? ??:</strong> {TARGET_TYPE_LABEL[selected.targetType] ?? selected.targetType}</p>
-          <p><strong>?? ???:</strong> {selected.targetOwnerNickname ? selected.targetOwnerNickname + " #" + selected.targetOwnerUserId : "-"}</p>
-          <p><strong>??:</strong> {selected.reason}</p>
-          <p><strong>??:</strong> {selected.detail}</p>
-          <p><strong>?? ??:</strong> {ACTION_LABEL[selected.resolutionAction] ?? selected.resolutionAction ?? "-"}</p>
-          <p><strong>?? ??:</strong> {selected.resolutionMemo || "-"}</p>
+          <p><strong>신고자:</strong> {selected.reporterNickname} ({selected.reporterEmail})</p>
+          <p><strong>대상 타입:</strong> {TARGET_TYPE_LABEL[selected.targetType] ?? selected.targetType}</p>
+          <p><strong>대상 사용자:</strong> {selected.targetOwnerNickname ? selected.targetOwnerNickname + " #" + selected.targetOwnerUserId : "-"}</p>
+          <p><strong>사유:</strong> {selected.reason}</p>
+          <p><strong>내용:</strong> {selected.detail}</p>
+          <p><strong>처리 조치:</strong> {ACTION_LABEL[selected.resolutionAction] ?? selected.resolutionAction ?? "-"}</p>
+          <p><strong>처리 메모:</strong> {selected.resolutionMemo || "-"}</p>
           <div className="actions">
-            {reportTargetLink(selected) ? (
-              <Link to={reportTargetLink(selected).to}>{reportTargetLink(selected).label}</Link>
-            ) : null}
-            {reportOwnerLink(selected) ? (
-              <Link to={reportOwnerLink(selected).to}>{reportOwnerLink(selected).label}</Link>
-            ) : null}
+            {dedupeLinks([
+              reportTargetLink(selected),
+              reportOwnerLink(selected),
+              isAdmin ? reportReporterLink(selected) : null,
+            ]).map((link) => (
+              <Link className="report-action-link" to={link.to} key={link.to}>{link.label}</Link>
+            ))}
           </div>
 
           {isAdmin && selected.status === "PENDING" ? (
             <>
               <div className="report-resolve-panel">
-                <h3>?? ??</h3>
+                <h3>빠른 처리</h3>
                 <div className="actions compact-actions">
                   {RESOLVE_PRESETS.map((preset) => (
                     <button
@@ -507,34 +539,48 @@ function ReportsPage() {
                 <p className="meta">{ACTION_DESCRIPTION[resolveAction]}</p>
               </div>
 
-              <label>?? ??</label>
+              <label>처리 상태</label>
               <select className="select" value={resolveStatus} onChange={(e) => setResolveStatus(e.target.value)} disabled={loading}>
-                <option value="RESOLVED">????</option>
-                <option value="REJECTED">??</option>
+                <option value="RESOLVED">처리완료</option>
+                <option value="REJECTED">반려</option>
               </select>
 
-              <label>?? ??</label>
+              <label>처리 조치</label>
               <select className="select" value={resolveAction} onChange={(e) => setResolveAction(e.target.value)} disabled={loading}>
                 {RESOLVE_ACTIONS.map((action) => (
                   <option key={action} value={action}>{ACTION_LABEL[action]}</option>
                 ))}
               </select>
 
-              <label>?? ??</label>
+              <label>처리 메모</label>
               <textarea
                 className="textarea"
                 value={resolveMemo}
                 onChange={(e) => setResolveMemo(e.target.value)}
                 disabled={loading}
                 maxLength={1000}
-                placeholder="??? ?? ??? ?????."
+                placeholder="처리 내용을 입력해주세요."
               />
 
               <div className="actions">
-                <button onClick={resolveReport} disabled={loading}>?? ??</button>
+                <button onClick={resolveReport} disabled={loading}>처리 저장</button>
               </div>
             </>
           ) : null}
+        </div>
+      ) : null}
+
+      {modalState.open ? (
+        <div className="modal-backdrop" role="dialog" aria-modal="true">
+          <div className="modal-card">
+            <h2>{modalState.title}</h2>
+            <p>{modalState.body}</p>
+            <div className="actions">
+              <button type="button" onClick={() => setModalState({ open: false, title: "", body: "" })}>
+                확인
+              </button>
+            </div>
+          </div>
         </div>
       ) : null}
     </main>

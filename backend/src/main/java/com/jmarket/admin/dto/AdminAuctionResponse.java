@@ -10,6 +10,7 @@ public record AdminAuctionResponse(
         Long startPrice,
         Long currentPrice,
         String status,
+        boolean hidden,
         Instant endAt,
         Instant closedAt
 ) {
@@ -22,6 +23,7 @@ public record AdminAuctionResponse(
                 auction.getStartPrice(),
                 currentPrice,
                 auction.getStatus().name(),
+                auction.isHidden(),
                 auction.getEndAt(),
                 auction.getClosedAt()
         );

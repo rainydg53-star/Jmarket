@@ -229,3 +229,26 @@
   white-space: nowrap;
 }
 
+.report-action-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 8px 12px;
+  border: 1px solid var(--jm-border);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--jm-text);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.report-action-link:hover,
+.report-action-link:focus-visible {
+  border-color: #111827;
+  color: #111827;
+  text-decoration: none;
+}
+

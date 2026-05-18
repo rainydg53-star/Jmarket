@@ -195,6 +195,16 @@ public class AdminController {
         return adminService.cancelAuction(auctionId, principal.getName());
     }
 
+    @DeleteMapping("/auctions/{auctionId}")
+    public void hideAuction(@PathVariable Long auctionId, Principal principal) {
+        adminService.hideAuction(auctionId, principal.getName());
+    }
+
+    @PatchMapping("/auctions/{auctionId}/restore")
+    public AdminAuctionResponse restoreAuction(@PathVariable Long auctionId, Principal principal) {
+        return adminService.restoreAuction(auctionId, principal.getName());
+    }
+
     @GetMapping("/audit-logs")
     public List<AdminAuditLogResponse> getAuditLogs() {
         return auditService.getRecentLogs();

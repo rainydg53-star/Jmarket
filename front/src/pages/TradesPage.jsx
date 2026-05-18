@@ -261,7 +261,8 @@ function TradesPage() {
         </select>
 
         <div className="actions">
-          <button className="secondary-button" onClick={() => loadTrades()} disabled={loading}>목록 새로고침</button>
+          <button className="secondary-button" onClick={() => loadTrades(roleFilter)}
+            >목록 새로고침</button>
         </div>
       </div>
 

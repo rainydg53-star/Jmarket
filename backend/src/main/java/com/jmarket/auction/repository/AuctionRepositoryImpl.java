@@ -27,6 +27,7 @@ public class AuctionRepositoryImpl implements AuctionRepositoryCustom {
         QProduct product = QProduct.product;
         QUser seller = QUser.user;
         BooleanBuilder visible = new BooleanBuilder()
+                .and(auction.hidden.isFalse())
                 .and(auction.status.eq(AuctionStatus.OPEN)
                         .or(auction.status.eq(AuctionStatus.CLOSED)
                                 .and(auction.closedAt.goe(closedCutoff))));
