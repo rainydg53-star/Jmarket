@@ -21,6 +21,28 @@
 
 ---
 
+# 🚀 Live Demo
+
+## 🌐 배포 주소
+
+🔗 http://3.34.44.26
+
+> 개인 포트폴리오 및 학습 목적의 프로젝트입니다.
+
+<br />
+
+# 🔑 Test Account
+
+| 권한 | 아이디 | 비밀번호 |
+| --- | --- | --- |
+| SUPER ADMIN | `1` | `1` |
+| ADMIN | `2` | `2` |
+| USER | `3` | `3` |
+
+> 테스트 계정은 자유롭게 사용 가능합니다.
+
+---
+
 ## Overview
 
 Jmarket는 단순 CRUD 기반 중고거래 서비스가 아니라, 실제 거래 서비스에서 발생하는 흐름을 고려해 만든 프로젝트입니다.
@@ -319,33 +341,7 @@ Jmarket
 
 ---
 
-## Live Demo / Local Run
 
-### Live Demo
-
-| 구분 | 주소 |
-| --- | --- |
-| 배포 사이트 | [http://3.34.44.26](http://3.34.44.26) |
-
-> 개인 학습 및 포트폴리오 목적의 배포 환경입니다. 테스트 데이터는 변경될 수 있습니다.
-
-### Local Run
-
-로컬 실행은 인프라 실행 후 백엔드와 프론트를 각각 실행합니다.
-
-```bash
-# infra
-cd infra
-docker compose up -d
-
-# backend
-cd ../backend
-./gradlew bootRun
-
-# frontend
-cd ../front
-npm install
-npm run dev
 ```
 
 | 구분 | 기본 주소 |
