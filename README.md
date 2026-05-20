@@ -44,7 +44,8 @@
 ---
 # 📕 Presentation
 
-🔗 [Jmarket 발표 PPT 보기](https://drive.google.com/file/d/13Yq-1KL2uzK3gjZ-SsLlEiXJ11UmvA6u/view?usp=sharing)
+🔗 [Jmarket PPT 보기](https://drive.google.com/file/d/13Yq-1KL2uzK3gjZ-SsLlEiXJ11UmvA6u/view?usp=sharing)
+
 ---
 ---
 
