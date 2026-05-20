@@ -42,6 +42,11 @@
 > 테스트 계정은 자유롭게 사용 가능합니다.
 
 ---
+# 📕 Presentation
+
+🔗 [Jmarket 발표 PPT 보기](https://drive.google.com/file/d/13Yq-1KL2uzK3gjZ-SsLlEiXJ11UmvA6u/view?usp=sharing)
+---
+---
 
 ## Overview
 
