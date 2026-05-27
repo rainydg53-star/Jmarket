@@ -67,7 +67,8 @@ Jmarket는 단순 CRUD 기반 중고거래 서비스가 아니라, 실제 거래
   <img src="https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=111111" alt="React" />
   <img src="https://img.shields.io/badge/Vite-Frontend-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
   <img src="https://img.shields.io/badge/React_Router-Routing-CA4245?style=for-the-badge&logo=reactrouter&logoColor=white" alt="React Router" />
-  <img src="https://img.shields.io/badge/STOMP-WebSocket-111827?style=for-the-badge" alt="STOMP" />
+  <img src="https://img.shields.io/badge/STOMP.js-WebSocket_Client-111827?style=for-the-badge" alt="STOMP.js" />
+  <img src="https://img.shields.io/badge/SockJS-Realtime-000000?style=for-the-badge" alt="SockJS" />
 </p>
 
 ### Backend
@@ -76,6 +77,7 @@ Jmarket는 단순 CRUD 기반 중고거래 서비스가 아니라, 실제 거래
   <img src="https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java" />
   <img src="https://img.shields.io/badge/Spring_Boot-3.3-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot" />
   <img src="https://img.shields.io/badge/Spring_Security-JWT-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white" alt="Spring Security" />
+  <img src="https://img.shields.io/badge/Spring_WebSocket-STOMP-111827?style=for-the-badge" alt="Spring WebSocket" />
   <img src="https://img.shields.io/badge/JPA-Hibernate-59666C?style=for-the-badge&logo=hibernate&logoColor=white" alt="JPA" />
 </p>
 
