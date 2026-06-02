@@ -30,6 +30,9 @@ import com.jmarket.auction.service.AuctionBidRedisService;
 import com.jmarket.auth.domain.User;
 import com.jmarket.auth.domain.UserRole;
 import com.jmarket.auth.repository.UserRepository;
+import com.jmarket.chat.domain.ChatRoom;
+import com.jmarket.chat.repository.ChatMessageRepository;
+import com.jmarket.chat.repository.ChatRoomRepository;
 import com.jmarket.common.exception.ErrorCode;
 import com.jmarket.common.exception.JmarketException;
 import com.jmarket.mileage.domain.MileageLedgerType;
@@ -74,6 +77,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AdminService {
 
+    private static final Set<TradeStatus> PRODUCT_DELETE_BLOCKING_TRADE_STATUSES =
+            Set.of(TradeStatus.REQUESTED, TradeStatus.ACCEPTED, TradeStatus.COMPLETED);
+
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final AuctionRepository auctionRepository;
@@ -86,6 +92,8 @@ public class AdminService {
     private final ProductQuestionRepository productQuestionRepository;
     private final ProductFavoriteRepository productFavoriteRepository;
     private final ProductViewRepository productViewRepository;
+    private final ChatRoomRepository chatRoomRepository;
+    private final ChatMessageRepository chatMessageRepository;
     private final AdminCategoryRepository categoryRepository;
     private final AdminAuditLogRepository auditLogRepository;
     private final UserRestrictionRepository restrictionRepository;
@@ -107,6 +115,8 @@ public class AdminService {
             ProductQuestionRepository productQuestionRepository,
             ProductFavoriteRepository productFavoriteRepository,
             ProductViewRepository productViewRepository,
+            ChatRoomRepository chatRoomRepository,
+            ChatMessageRepository chatMessageRepository,
             AdminCategoryRepository categoryRepository,
             AdminAuditLogRepository auditLogRepository,
             UserRestrictionRepository restrictionRepository,
@@ -127,6 +137,8 @@ public class AdminService {
         this.productQuestionRepository = productQuestionRepository;
         this.productFavoriteRepository = productFavoriteRepository;
         this.productViewRepository = productViewRepository;
+        this.chatRoomRepository = chatRoomRepository;
+        this.chatMessageRepository = chatMessageRepository;
         this.categoryRepository = categoryRepository;
         this.auditLogRepository = auditLogRepository;
         this.restrictionRepository = restrictionRepository;
@@ -492,6 +504,7 @@ public class AdminService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new JmarketException(ErrorCode.PRODUCT_NOT_FOUND));
         validateDeletableProduct(productId);
+        deleteCanceledTradeHistory(productId);
         productImageRepository.deleteAllByProductId(productId);
         productQuestionRepository.deleteAllByProductId(productId);
         productFavoriteRepository.deleteAllByProductId(productId);
@@ -502,9 +515,28 @@ public class AdminService {
     }
 
     private void validateDeletableProduct(Long productId) {
-        if (tradeRepository.existsByProductId(productId) || auctionRepository.existsByProductId(productId)) {
+        if (tradeRepository.existsByProductIdAndStatusIn(productId, PRODUCT_DELETE_BLOCKING_TRADE_STATUSES)
+                || auctionRepository.existsByProductId(productId)) {
             throw new JmarketException(ErrorCode.PRODUCT_DELETE_NOT_ALLOWED);
         }
+    }
+
+    private void deleteCanceledTradeHistory(Long productId) {
+        List<Long> canceledTradeIds = tradeRepository.findAllByProductIdAndStatus(productId, TradeStatus.CANCELED).stream()
+                .map(Trade::getId)
+                .toList();
+        if (canceledTradeIds.isEmpty()) {
+            return;
+        }
+
+        List<Long> roomIds = chatRoomRepository.findAllByTradeIdIn(canceledTradeIds).stream()
+                .map(ChatRoom::getId)
+                .toList();
+        if (!roomIds.isEmpty()) {
+            chatMessageRepository.deleteAllByRoomIdIn(roomIds);
+            chatRoomRepository.deleteAllByTradeIdIn(canceledTradeIds);
+        }
+        tradeRepository.deleteAllByProductIdAndStatus(productId, TradeStatus.CANCELED);
     }
 
     private void deleteSearchIndex(Long productId) {

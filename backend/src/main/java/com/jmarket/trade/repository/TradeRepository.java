@@ -14,6 +14,10 @@ public interface TradeRepository extends JpaRepository<Trade, Long> {
 
     Optional<Trade> findFirstByProductIdAndStatusInOrderByRequestedAtDesc(Long productId, Collection<TradeStatus> statuses);
 
+    List<Trade> findAllByProductIdAndStatus(Long productId, TradeStatus status);
+
+    void deleteAllByProductIdAndStatus(Long productId, TradeStatus status);
+
     List<Trade> findAllByBuyerIdOrderByRequestedAtDesc(Long buyerId);
 
     List<Trade> findAllBySellerIdOrderByRequestedAtDesc(Long sellerId);

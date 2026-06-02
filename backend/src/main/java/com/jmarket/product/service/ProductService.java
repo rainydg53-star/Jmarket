@@ -7,6 +7,9 @@ import com.jmarket.admin.service.UserRestrictionService;
 import com.jmarket.auction.repository.AuctionRepository;
 import com.jmarket.auth.domain.User;
 import com.jmarket.auth.repository.UserRepository;
+import com.jmarket.chat.domain.ChatRoom;
+import com.jmarket.chat.repository.ChatMessageRepository;
+import com.jmarket.chat.repository.ChatRoomRepository;
 import com.jmarket.common.exception.ErrorCode;
 import com.jmarket.common.exception.JmarketException;
 import com.jmarket.product.domain.Product;
@@ -61,6 +64,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class ProductService {
 
     private static final Set<TradeStatus> ACTIVE_TRADE_STATUSES = EnumSet.of(TradeStatus.REQUESTED, TradeStatus.ACCEPTED);
+    private static final Set<TradeStatus> PRODUCT_DELETE_BLOCKING_TRADE_STATUSES =
+            EnumSet.of(TradeStatus.REQUESTED, TradeStatus.ACCEPTED, TradeStatus.COMPLETED);
     private static final long MAX_IMAGE_SIZE_BYTES = 5L * 1024 * 1024;
     private static final int MAX_IMAGE_UPLOAD_COUNT = 10;
     private static final Set<String> ALLOWED_IMAGE_EXTENSIONS = Set.of("jpg", "jpeg", "png", "gif", "webp");
@@ -82,6 +87,8 @@ public class ProductService {
     private final AuctionRepository auctionRepository;
     private final TradeRepository tradeRepository;
     private final UserReviewRepository userReviewRepository;
+    private final ChatRoomRepository chatRoomRepository;
+    private final ChatMessageRepository chatMessageRepository;
     private final ProductSearchService productSearchService;
 
     public ProductService(
@@ -96,6 +103,8 @@ public class ProductService {
             AuctionRepository auctionRepository,
             TradeRepository tradeRepository,
             UserReviewRepository userReviewRepository,
+            ChatRoomRepository chatRoomRepository,
+            ChatMessageRepository chatMessageRepository,
             ObjectProvider<ProductSearchService> productSearchServiceProvider
     ) {
         this.productRepository = productRepository;
@@ -109,6 +118,8 @@ public class ProductService {
         this.auctionRepository = auctionRepository;
         this.tradeRepository = tradeRepository;
         this.userReviewRepository = userReviewRepository;
+        this.chatRoomRepository = chatRoomRepository;
+        this.chatMessageRepository = chatMessageRepository;
         this.productSearchService = productSearchServiceProvider.getIfAvailable();
     }
 
@@ -211,6 +222,7 @@ public class ProductService {
         User currentUser = findUserByEmail(currentUserEmail);
         validateSeller(product, currentUser);
         validateDeletableProduct(productId);
+        deleteCanceledTradeHistory(productId);
         productImageRepository.deleteAllByProductId(productId);
         productQuestionRepository.deleteAllByProductId(productId);
         productFavoriteRepository.deleteAllByProductId(productId);
@@ -220,9 +232,28 @@ public class ProductService {
     }
 
     private void validateDeletableProduct(Long productId) {
-        if (tradeRepository.existsByProductId(productId) || auctionRepository.existsByProductId(productId)) {
+        if (tradeRepository.existsByProductIdAndStatusIn(productId, PRODUCT_DELETE_BLOCKING_TRADE_STATUSES)
+                || auctionRepository.existsByProductId(productId)) {
             throw new JmarketException(ErrorCode.PRODUCT_DELETE_NOT_ALLOWED);
         }
+    }
+
+    private void deleteCanceledTradeHistory(Long productId) {
+        List<Long> canceledTradeIds = tradeRepository.findAllByProductIdAndStatus(productId, TradeStatus.CANCELED).stream()
+                .map(com.jmarket.trade.domain.Trade::getId)
+                .toList();
+        if (canceledTradeIds.isEmpty()) {
+            return;
+        }
+
+        List<Long> roomIds = chatRoomRepository.findAllByTradeIdIn(canceledTradeIds).stream()
+                .map(ChatRoom::getId)
+                .toList();
+        if (!roomIds.isEmpty()) {
+            chatMessageRepository.deleteAllByRoomIdIn(roomIds);
+            chatRoomRepository.deleteAllByTradeIdIn(canceledTradeIds);
+        }
+        tradeRepository.deleteAllByProductIdAndStatus(productId, TradeStatus.CANCELED);
     }
 
     @Transactional

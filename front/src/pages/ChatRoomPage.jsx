@@ -122,6 +122,8 @@ function ChatRoomPage() {
   const otherNickname = room && me
     ? room.participantAId === me.id ? room.participantBNickname : room.participantANickname
     : "";
+  const connectionStatusClass = isTradeEnded ? "muted" : connected ? "success" : "muted";
+  const connectionStatusLabel = isTradeEnded ? "종료" : connected ? "실시간 연결" : "연결 대기";
   const shouldShowMessage = loading
     || message.includes("실패")
     || message.includes("오류")
@@ -163,8 +165,8 @@ function ChatRoomPage() {
               {room ? `${room.participantANickname} / ${room.participantBNickname}` : "참여자 정보를 불러오는 중"}
             </p>
           </div>
-          <span className={`status-badge ${connected ? "success" : "muted"}`}>
-            {connected ? "실시간 연결" : "연결 대기"}
+          <span className={`status-badge ${connectionStatusClass}`}>
+            {connectionStatusLabel}
           </span>
         </div>
         {shouldShowMessage ? <p className="chat-room-message">{loading ? "요청 처리 중..." : message}</p> : null}

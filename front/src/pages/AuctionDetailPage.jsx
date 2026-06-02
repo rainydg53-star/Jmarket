@@ -565,8 +565,11 @@ function AuctionDetailPage() {
       <h1>{detailLabels.pageTitle}</h1>
       <div className="card">
         <p className="meta">
-          <Link to="/auctions">{detailLabels.backToList}</Link>
+          <Link to="/auctions/products">{detailLabels.backToList}</Link>
         </p>
+        <div className="actions">
+          <Link className="primary-link-button" to="/auctions/products">경매 목록으로</Link>
+        </div>
         <p className="meta">
           {detailLabels.realtime}: {connected ? detailLabels.connected : detailLabels.disconnected}
         </p>

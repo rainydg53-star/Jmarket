@@ -1,6 +1,7 @@
 package com.jmarket.chat.repository;
 
 import com.jmarket.chat.domain.ChatMessage;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,4 +14,6 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
     long countByRoomIdAndIdGreaterThan(Long roomId, Long messageId);
 
     long countByRoomId(Long roomId);
+
+    void deleteAllByRoomIdIn(Collection<Long> roomIds);
 }

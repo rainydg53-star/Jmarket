@@ -313,6 +313,9 @@ function ProductDetailPage() {
         <p className="meta">
           <Link to="/products">목록으로</Link>
         </p>
+        <div className="actions">
+          <Link className="primary-link-button" to="/products">상품 목록으로</Link>
+        </div>
         {shouldShowMessage ? <p>{loading ? "요청 처리 중..." : message}</p> : null}
       </div>
 

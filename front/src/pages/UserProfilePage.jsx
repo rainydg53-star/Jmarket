@@ -49,6 +49,10 @@ function UserProfilePage() {
         <p className="meta">
           <Link to="/products">상품 목록으로</Link>
         </p>
+        <div className="actions">
+          <Link className="primary-link-button" to="/products">상품 목록으로</Link>
+          <Link className="primary-link-button" to="/auctions/products">경매 목록으로</Link>
+        </div>
         {shouldShowMessage ? (
           <p className={`page-message ${loading ? "loading" : message.includes("실패") ? "error" : ""}`}>
             {loading ? "요청 처리 중..." : message}

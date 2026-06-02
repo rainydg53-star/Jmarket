@@ -1,6 +1,7 @@
 package com.jmarket.chat.repository;
 
 import com.jmarket.chat.domain.ChatRoom;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -30,4 +31,8 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
             order by case when r.lastMessageAt is null then 1 else 0 end, r.lastMessageAt desc, r.createdAt desc
             """)
     List<ChatRoom> findMyRooms(Long userId);
+
+    List<ChatRoom> findAllByTradeIdIn(Collection<Long> tradeIds);
+
+    void deleteAllByTradeIdIn(Collection<Long> tradeIds);
 }
