@@ -92,6 +92,8 @@ function HomePage() {
       title: product.title,
       imageUrl: product.thumbnailUrl,
       to: `/products/${product.id}`,
+      type: "product",
+      typeLabel: "상품",
       score: Number(product.favoriteCount ?? 0) * 4 + Number(product.viewCount ?? 0),
     }));
     const auctionRanks = auctions.map((auction) => ({
@@ -100,6 +102,8 @@ function HomePage() {
       title: auction.productTitle,
       imageUrl: auction.thumbnailUrl,
       to: `/auctions/${auction.id}`,
+      type: "auction",
+      typeLabel: "경매",
       score: Number(auction.currentHighestBid ?? 0) / 1000,
     }));
 
@@ -162,7 +166,10 @@ function HomePage() {
                   ) : (
                     <span className="home-rank-thumb empty" />
                   )}
-                  <span className="home-rank-title">{item.title}</span>
+                  <span className="home-rank-title-wrap">
+                    <span className={`home-rank-type ${item.type}`}>{item.typeLabel}</span>
+                    <span className="home-rank-title">{item.title}</span>
+                  </span>
                   <RankingDelta delta={item.delta} />
                 </Link>
               </li>

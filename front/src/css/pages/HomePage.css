@@ -142,6 +142,34 @@
   white-space: nowrap;
 }
 
+.home-rank-title-wrap {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+}
+
+.home-rank-type {
+  flex: 0 0 auto;
+  min-width: 34px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.home-rank-type.product {
+  background: #e8efff;
+  color: #1f5eff;
+}
+
+.home-rank-type.auction {
+  background: #fff4cf;
+  color: #a16207;
+}
+
 .home-rank-delta {
   justify-self: end;
   color: #64748b;

@@ -166,6 +166,7 @@ function TradesPage() {
     await loadTrades(nextRole);
   };
   const shouldShowMessage = loading || message.includes("실패") || message.includes("입력") || message.includes("처리 성공") || message.includes("등록 성공");
+  const canOpenTradeChat = (trade) => !["COMPLETED", "CANCELED"].includes(trade.status);
 
   const renderActions = (trade) => {
     if (!me) {
@@ -299,9 +300,11 @@ function TradesPage() {
                 ) : null}
                 {renderActions(trade)}
                 {renderReviewForm(trade)}
-                <div className="actions">
-                  <button onClick={() => openTradeChatRoom(trade.id)} disabled={loading}>채팅 시작</button>
-                </div>
+                {canOpenTradeChat(trade) ? (
+                  <div className="actions">
+                    <button onClick={() => openTradeChatRoom(trade.id)} disabled={loading}>채팅 시작</button>
+                  </div>
+                ) : null}
               </li>
             ))}
           </ul>
