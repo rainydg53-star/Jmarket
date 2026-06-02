@@ -7,7 +7,7 @@ import { getAuctionDisplayStatusInfo, getAuctionRemainingTimeInfo, isAuctionTime
 import { clearAccessToken, getAccessToken } from "../lib/auth";
 import { openChatWindow } from "../lib/chatWindow";
 import { API_BASE_URL } from "../lib/config";
-import { canBidAuction, canUseUserActions } from "../lib/permissions";
+import { canBidAuction, canUseUserActions, isAdmin } from "../lib/permissions";
 import { parseRestrictionMessage } from "../lib/restriction";
 
 import "../css/pages/AuctionDetailPage.css";
@@ -477,6 +477,9 @@ function AuctionDetailPage() {
   const remainingTime = getAuctionRemainingTimeInfo(auction, now);
   const displayStatus = getAuctionDisplayStatusInfo(auction, now);
   const shouldShowMessage = loading || Boolean(message);
+  const isStatusLoading = loading || message.includes("불러오는 중");
+  const shouldShowAdminStatusCard = isAdmin(me) && shouldShowMessage;
+  const shouldShowUserStatusModal = !isAdmin(me) && shouldShowMessage;
   const auctionTimerId = auction?.id;
   const auctionTimerStatus = auction?.status;
   const auctionTimerStartAt = auction?.startAt;
@@ -563,18 +566,11 @@ function AuctionDetailPage() {
   return (
     <main className="container">
       <h1>{detailLabels.pageTitle}</h1>
-      <div className="card">
-        <p className="meta">
-          <Link to="/auctions/products">{detailLabels.backToList}</Link>
-        </p>
-        <div className="actions">
-          <Link className="primary-link-button" to="/auctions/products">경매 목록으로</Link>
+      {shouldShowAdminStatusCard ? (
+        <div className="card">
+          <p>{isStatusLoading ? detailLabels.loading : message}</p>
         </div>
-        <p className="meta">
-          {detailLabels.realtime}: {connected ? detailLabels.connected : detailLabels.disconnected}
-        </p>
-        {shouldShowMessage ? <p>{loading ? detailLabels.loading : message}</p> : null}
-      </div>
+      ) : null}
 
       {auction ? (
         <div className="card">
@@ -763,6 +759,9 @@ function AuctionDetailPage() {
               <button type="button" onClick={submitAuctionReview} disabled={loading}>{detailLabels.submitReview}</button>
             </div>
           ) : null}
+          <div className="actions auction-detail-bottom-actions">
+            <Link className="primary-link-button" to="/auctions/products">경매 목록으로</Link>
+          </div>
         </div>
       ) : null}
 
@@ -802,6 +801,20 @@ function AuctionDetailPage() {
             <div className="actions">
               <button type="button" onClick={() => setRestrictionModal(null)}>{detailLabels.close}</button>
             </div>
+          </div>
+        </div>
+      ) : null}
+
+      {shouldShowUserStatusModal && !restrictionModal ? (
+        <div className="modal-backdrop" role="dialog" aria-modal="true">
+          <div className="modal-card">
+            <h2>{isStatusLoading ? "처리 중" : "안내"}</h2>
+            <p>{isStatusLoading ? detailLabels.loading : message}</p>
+            {!isStatusLoading ? (
+              <div className="actions">
+                <button type="button" onClick={() => setMessage("")}>확인</button>
+              </div>
+            ) : null}
           </div>
         </div>
       ) : null}

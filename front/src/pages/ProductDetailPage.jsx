@@ -6,7 +6,7 @@ import { api } from "../lib/api";
 import { clearAccessToken } from "../lib/auth";
 import { openChatWindow } from "../lib/chatWindow";
 import { API_BASE_URL } from "../lib/config";
-import { canUseUserActions } from "../lib/permissions";
+import { canUseUserActions, isAdmin } from "../lib/permissions";
 
 import "../css/pages/ProductDetailPage.css";
 const sellerTrustLabel = (product) => {
@@ -305,19 +305,18 @@ function ProductDetailPage() {
     || message.includes("실패")
     || message.includes("오류")
     || message.includes("불러오는 중");
+  const isStatusLoading = loading || message.includes("불러오는 중");
+  const shouldShowAdminStatusCard = isAdmin(me) && shouldShowMessage;
+  const shouldShowUserStatusModal = !isAdmin(me) && shouldShowMessage;
 
   return (
     <main className="container">
       <h1>상품 상세</h1>
-      <div className="card">
-        <p className="meta">
-          <Link to="/products">목록으로</Link>
-        </p>
-        <div className="actions">
-          <Link className="primary-link-button" to="/products">상품 목록으로</Link>
+      {shouldShowAdminStatusCard ? (
+        <div className="card">
+          <p>{isStatusLoading ? "요청 처리 중..." : message}</p>
         </div>
-        {shouldShowMessage ? <p>{loading ? "요청 처리 중..." : message}</p> : null}
-      </div>
+      ) : null}
 
       {product ? (
         <div className="card">
@@ -403,6 +402,9 @@ function ProductDetailPage() {
               </button>
             </div>
           ) : null}
+          <div className="actions product-detail-bottom-actions">
+            <Link className="primary-link-button" to="/products">상품 목록으로</Link>
+          </div>
         </div>
       ) : null}
 
@@ -513,6 +515,20 @@ function ProductDetailPage() {
           onCancel={() => setShowDeleteModal(false)}
           onConfirm={deleteProduct}
         />
+      ) : null}
+
+      {shouldShowUserStatusModal ? (
+        <div className="modal-backdrop" role="dialog" aria-modal="true">
+          <div className="modal-card">
+            <h2>{isStatusLoading ? "처리 중" : "안내"}</h2>
+            <p>{isStatusLoading ? "요청 처리 중..." : message}</p>
+            {!isStatusLoading ? (
+              <div className="actions">
+                <button type="button" onClick={() => setMessage("")}>확인</button>
+              </div>
+            ) : null}
+          </div>
+        </div>
       ) : null}
 
       {showMileageModal ? (

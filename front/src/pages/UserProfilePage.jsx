@@ -46,9 +46,6 @@ function UserProfilePage() {
     <main className="container">
       <h1>사용자 프로필</h1>
       <div className="card">
-        <p className="meta">
-          <Link to="/products">상품 목록으로</Link>
-        </p>
         <div className="actions">
           <Link className="primary-link-button" to="/products">상품 목록으로</Link>
           <Link className="primary-link-button" to="/auctions/products">경매 목록으로</Link>
