@@ -26,7 +26,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws-chat")
-                .setAllowedOriginPatterns("http://localhost:5173","http://3.34.44.26","https://jmarketjs.com","http://jmarketjs.com");
+                .setAllowedOriginPatterns(
+                        "http://localhost:5173",
+                        "https://jmarketjs.com"
+                );
     }
 
     @Override
