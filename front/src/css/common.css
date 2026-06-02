@@ -1,6 +1,7 @@
 /* Shared app layout, controls, modals, and design-system overrides. */
 
 .container {
+  width: 100%;
   max-width: 720px;
   margin: 24px auto 40px;
   padding: 0 16px;
